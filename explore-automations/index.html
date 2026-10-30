@@ -1214,7 +1214,7 @@
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="good">
               <span class="cl-step-num"><span class="digit">2</span><span class="tick">&#10003;</span></span>
-              <span class="cl-step-name">Meet the repository: Tailspin Toys</span>
+              <span class="cl-step-name">Initiate session from Issue</span>
               <span class="cl-step-time">15 min</span>
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="mcp">
@@ -1300,90 +1300,20 @@
           </nav>
         </article>
 
-        <!-- Step 2: Introduce the workshop repository -->
+        <!-- Step 2: Initiate session from Issue -->
         <article class="cl-step mcp-lab" id="good" data-minutes="15" tabindex="-1">
           <span class="cl-duration">Duration: 15 minutes</span>
-          <h2>Meet the repository: <span class="accent">Tailspin Toys</span></h2>
+          <h2>Initiate session from <span class="accent">Issue</span></h2>
 
-          <section class="sowhat is-step" aria-labelledby="tailspin-repository">
-            <span class="sowhat-label" id="tailspin-repository">Today's repository</span>
-            <strong class="sowhat-head"><a href="https://github.com/github-samples/tailspin-toys"
-                target="_blank" rel="noopener noreferrer">github-samples / tailspin-toys &#8599;</a></strong>
-            <span>A public sample site for a fictional game crowdfunding company, built with Astro and a local
-              SQLite database. Treat it as code you have never seen before.</span>
-          </section>
-
-          <h3 class="sec-title">1. Create your own copy</h3>
-          <p class="sec-note">Work in your own repository so you can raise issues later. Open
-            <a href="https://github.com/github-samples/tailspin-toys" target="_blank"
-              rel="noopener noreferrer">github-samples/tailspin-toys &#8599;</a>, choose
-            <strong>Use this template</strong> &rarr; <strong>Create a new repository</strong>, keep the name
-            <strong>tailspin-toys</strong> and create it in your own account. GitHub may also open a few starter
-            issues in the new repository. You can ignore them.</p>
-
-          <h3 class="sec-title">2. Open your repository in the app</h3>
+          <h3 class="sec-title">1. Start from your repository</h3>
+          <p class="sec-note">In the Copilot app, find your <strong>tailspin-toys</strong> repository under
+            <strong>Sessions</strong>. Click the highlighted <strong>Create from&hellip;</strong> icon beside its name to begin.</p>
           <figure class="shot">
-            <img src="assets/tailspin-toys-open-app.png"
-              alt="Tailspin Toys repository with the Code menu and Open the app option highlighted"
-              width="805" height="437">
-            <figcaption>Code &rarr; Local &rarr; Open the app. Use this menu on your new repository.</figcaption>
+            <img src="assets/tailspin-toys-create-from.png"
+              alt="Copilot app with the branch-plus Create from icon and tooltip highlighted beside tailspin-toys under Sessions"
+              width="2000" height="1021">
+            <figcaption>Click the highlighted Create from&hellip; icon beside tailspin-toys.</figcaption>
           </figure>
-
-          <h3 class="sec-title">3. Allow the repository to be cloned</h3>
-          <figure class="shot">
-            <img src="assets/tailspin-toys-allow-clone.png"
-              alt="Clone repository confirmation dialog with the Allow button highlighted"
-              width="590" height="417">
-            <figcaption>Confirm your repository &rarr; Allow. Your own repository name appears in the dialog.</figcaption>
-          </figure>
-
-          <h3 class="sec-title">4. Find the repository in Sessions</h3>
-          <figure class="shot">
-            <img src="assets/tailspin-toys-sessions.png"
-              alt="App sidebar showing the repository under Sessions with No sessions yet"
-              width="713" height="437">
-            <figcaption>Sessions &rarr; your repository. The name in this screenshot may differ from yours.</figcaption>
-          </figure>
-
-          <h3 class="sec-title">5. Ask Copilot to run the app locally</h3>
-          <p class="sec-note">Start a new session for your <strong>tailspin-toys</strong> repository. Check that
-            <strong>Current checkout</strong> is selected, paste the prompt below and click the send arrow.</p>
-          <blockquote class="mcp-lab-prompt">please run this app locally</blockquote>
-          <figure class="shot">
-            <video controls playsinline preload="metadata" width="720" height="840"
-              aria-label="Recording showing the prompt please run this app locally being submitted to Copilot">
-              <source src="assets/tailspin-toys-run-locally.mp4" type="video/mp4">
-              Your browser does not support embedded video.
-              <a href="assets/tailspin-toys-run-locally.mp4">Open the recording</a>.
-            </video>
-            <figcaption>Send the prompt &rarr; Copilot starts a session to run the app locally.</figcaption>
-          </figure>
-
-          <h3 class="sec-title">6. Explore the running app</h3>
-          <p class="sec-note">Once Copilot confirms the app is running, open the local URL it provides
-            (<code>http://localhost:4321/</code> in this recording). Browse <strong>Featured Games</strong>, click
-            <strong>View details</strong> on a game, then use <strong>Back to all games</strong> to return to the
-            catalogue.</p>
-          <figure class="shot">
-            <video controls playsinline preload="metadata" width="2646" height="2140"
-              aria-label="Recording showing the running Tailspin Toys app, featured games, and a game details page">
-              <source src="assets/tailspin-toys-explore-running-app.mp4" type="video/mp4">
-              Your browser does not support embedded video.
-              <a href="assets/tailspin-toys-explore-running-app.mp4">Open the recording</a>.
-            </video>
-            <figcaption>Open the local app &rarr; View details &rarr; Back to all games</figcaption>
-          </figure>
-
-          <aside class="checkpoint" aria-label="Running app checkpoint">
-            <span class="checkpoint-label">Checkpoint</span>
-            <span class="checkpoint-head">Your app is running locally</span>
-            <ul>
-              <li>Your repository appears under Sessions.</li>
-              <li>You can open the local URL provided by Copilot and see Featured Games.</li>
-              <li>You can open a game's details and return with Back to all games.</li>
-            </ul>
-            <p>If any check fails, pause here and resolve it before moving on to codebase exploration.</p>
-          </aside>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
