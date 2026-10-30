@@ -10,9 +10,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Hubot+Sans:wdth,wght@75..125,200..900&family=Mona+Sans:wdth,wght@75..125,200..900&family=JetBrains+Mono:wght@400;500;700&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="../theme.css">
+  <link data-fx rel="icon" href="../assets/copilot-mascot.png">
   <style>
     :root {
       --workshop-bg: #0d1117;
@@ -1158,6 +1159,181 @@
         break-inside: avoid;
       }
     }
+    /* ============ Mission control: progressive visual enhancement ============ */
+    :root {
+      --font-sans: "Mona Sans", system-ui, sans-serif;
+      --font-display: "Hubot Sans", var(--font-sans);
+      --workshop-faint: #b0bed1;
+    }
+    body, .workshop-contact, .mcp-lab .copy-btn { font-family: var(--font-sans); }
+    .workshop-contact-kicker { opacity: 1; color: #b0bed1; }
+    body { background: #090e18; }
+    h1, h2, .stage-title, .stage-num, .crit-card > b, .cl-step-num, .sowhat-head {
+      font-family: var(--font-display) !important;
+      letter-spacing: -0.02em;
+    }
+    .cl-app { position: relative; isolation: isolate; }
+    .cl-topbar { background: rgba(9, 14, 24, 0.94); border-bottom-color: #35435c; }
+    .cl-topbar-title h1 { font-weight: 750; line-height: 1.25; }
+    .cl-step h2 { font-size: clamp(2rem, 3.4vw, 3rem); line-height: 1.12; margin-bottom: 20px; }
+    .cl-step { background: rgba(13, 21, 35, 0.94); border-color: #334058; box-shadow: 0 24px 80px #0005; }
+    .cl-rail { background: rgba(12, 20, 33, 0.96); border-color: #334058; }
+    .cl-step.is-active { animation: none; }
+    .cl-topbar-title .kicker::before {
+      content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 7px;
+      border-radius: 50%; background: #7ef0ac; box-shadow: 0 0 12px #4ade80;
+      animation: fx-pulse 3s ease-in-out infinite;
+    }
+    .fx-ambient { position: fixed; inset: 0; z-index: -1; overflow: clip; pointer-events: none; }
+    .fx-ambient::after {
+      content: ""; position: absolute; inset: 0;
+      background-image: radial-gradient(#8db5ff28 1px, transparent 1px);
+      background-size: 30px 30px; mask-image: radial-gradient(ellipse at 50% 20%, #000, transparent 75%);
+    }
+    .fx-aurora { position: absolute; width: 85vw; height: 85vh; border-radius: 50%; opacity: 0.65; }
+    .fx-aurora:nth-child(1) { top: -40%; left: -20%; background: radial-gradient(ellipse, #3475ff33, transparent 65%); animation: fx-drift 29s ease-in-out infinite alternate; }
+    .fx-aurora:nth-child(2) { top: 0; right: -40%; background: radial-gradient(ellipse, #9856ff29, transparent 65%); animation: fx-drift 37s ease-in-out infinite alternate-reverse; }
+    .fx-aurora:nth-child(3) { bottom: -50%; left: 10%; background: radial-gradient(ellipse, #28cf9b20, transparent 65%); animation: fx-drift 33s ease-in-out infinite alternate; }
+    .cl-step h2 .accent { color: #97edc6; }
+    @supports (background-clip: text) {
+      .cl-step h2 .accent {
+        background: linear-gradient(110deg, #95f2bd, #9bcaff 45%, #d2b7ff 75%, #95f2bd);
+        background-clip: text; -webkit-text-fill-color: transparent;
+      }
+    }
+    .mcp-lab .crit-card, .mcp-lab .stage, .sowhat, .checkpoint, .resource-card, .meta-card {
+      position: relative;
+      background-image: radial-gradient(500px circle at var(--fx-x, -500px) var(--fx-y, -500px), #91baff0d, transparent 70%), linear-gradient(145deg, #182439ee, #101a2bef);
+      box-shadow: inset 0 1px #ffffff08, 0 8px 26px #0002;
+      transition: transform 220ms ease;
+    }
+    .mcp-lab .stage { border-color: #3b4964; }
+    .sowhat { border-color: #69d6a86b; border-left-color: #8aefbd; }
+    .checkpoint { border-color: #e7bd766b; border-left-color: #fbbf24; }
+    .mcp-lab .stage-num, .mcp-lab .crit-card > b {
+      color: #e5dcff; background: linear-gradient(140deg, #514185, #233d60);
+      border: 1px solid #a68ae77a; box-shadow: 0 0 20px #8e6dff16;
+    }
+    .cl-steps.has-marker::before { background: linear-gradient(120deg, #233e51, #2c2445); border-color: #87c6ff8c; box-shadow: inset 0 0 18px #98b3ff14, 0 0 18px #739bff12; }
+    .cl-step-item.is-active .cl-step-num { position: relative; color: #d6e8ff; background: #253c59; box-shadow: 0 0 0 3px #8cbeff26; }
+    .cl-step-item.is-active .cl-step-num::after { content: ""; position: absolute; inset: -4px; border: 1px solid #9bcaff8c; border-radius: inherit; animation: fx-pulse 3s ease-in-out infinite; pointer-events: none; }
+    .cl-step-item.is-done .tick { animation: fx-pop 250ms ease-out; }
+    .meta-card { overflow: hidden; border-color: #9584cd; }
+    .meta-card::before {
+      content: ""; position: absolute; inset: -150%; z-index: 0;
+      background: conic-gradient(from 0deg, #111b30, #7a9ce2, #ac88e8, #70dca8, #111b30);
+      animation: fx-orbit 16s linear infinite; opacity: 0.3;
+    }
+    .meta-card::after { content: ""; position: absolute; inset: 1px; border-radius: inherit; background: #142035; pointer-events: none; }
+    .meta-card > * { position: relative; z-index: 1; }
+    .cl-progress-fill { position: relative; box-shadow: 3px 0 14px #9ac7ff; overflow: hidden; }
+    .cl-progress-fill::after, .cl-next::after, .cl-finished::after {
+      content: ""; position: absolute; inset: 0;
+      background: linear-gradient(100deg, transparent 25%, #ffffff26, transparent 75%);
+      transform: translateX(-100%); pointer-events: none;
+    }
+    .cl-progress-fill::after { animation: fx-sweep 4s ease-in-out infinite; }
+    .cl-btn.cl-next { position: relative; overflow: hidden; background: linear-gradient(120deg, #274b76, #503a79); border-color: #a4baff80; }
+    .cl-btn { transition: transform 180ms ease, opacity 180ms ease; }
+    .cl-btn.cl-next:hover { filter: none; transform: translateX(2px); }
+    .cl-next:hover::after { animation: fx-sweep 700ms ease-out; }
+    .cl-btn.cl-back { background: transparent; }
+    .cl-btn.cl-back:hover { background: #93c5fd12; }
+    .cl-finished { position: relative; overflow: hidden; }
+    .cl-finished.fx-celebrate::after { animation: fx-sweep 1.5s ease-out; }
+    .overview-figure {
+      position: relative; min-height: 260px; gap: 30px; overflow: clip; padding: 28px 16px;
+      border-radius: 24px; background: radial-gradient(ellipse at 32% 45%, #3b4fac25, transparent 62%);
+      perspective: 900px;
+    }
+    .fx-pilot { position: relative; flex: 0 0 220px; width: 220px; height: 200px; display: grid; place-items: center; }
+    .fx-pilot::before {
+      content: ""; position: absolute; inset: 12%; border-radius: 50%;
+      background: radial-gradient(ellipse, #7d89ff55, #3b80ff12 50%, transparent 70%);
+      animation: fx-pulse 4s ease-in-out infinite;
+    }
+    .fx-tilt { position: relative; width: 200px; transition: transform 350ms ease-out; transform: rotateX(var(--fx-rx, 0deg)) rotateY(var(--fx-ry, 0deg)); }
+    .overview-figure .mascot { width: 100%; display: block; position: relative; animation: fx-float 6s ease-in-out infinite; }
+    .fx-eye { position: absolute; top: 58.2%; height: 15.2%; border-radius: 50%; background: #bceaff; opacity: 0.17; box-shadow: 0 0 14px 5px #69caff; pointer-events: none; animation: fx-float 6s ease-in-out infinite; }
+    .fx-eye-left { left: 36.4%; width: 6.9%; }
+    .fx-eye-right { left: 56.4%; width: 7.2%; }
+    .fx-typing .fx-eye { opacity: 0.32; }
+    .fx-orbit { position: absolute; inset: 13px -2px; border: 1px solid #a0bbff38; border-radius: 50%; transform: rotate(-20deg); pointer-events: none; }
+    .fx-orbit-inner { inset: -12px 20px; transform: rotate(35deg); border-style: dashed; opacity: 0.5; }
+    .fx-orbit-dot { position: absolute; inset: 0; animation: fx-orbit 12s linear infinite; }
+    .fx-orbit-dot::before { content: ""; position: absolute; left: 50%; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: var(--dot); box-shadow: 0 0 14px var(--dot); }
+    .fx-orbit-dot:nth-child(2) { animation-delay: -4s; }
+    .fx-orbit-dot:nth-child(3) { animation-delay: -8s; }
+    .fx-bubble {
+      flex: 0 1 330px; min-height: 82px; padding: 20px; border: 1px solid #7d9de866; border-radius: 18px 18px 18px 4px;
+      background: #111d32; color: #d7e8ff; font: 0.85rem/1.6 "JetBrains Mono", monospace;
+      box-shadow: 0 14px 40px #0003;
+    }
+    .fx-caret { display: inline-block; width: 2px; height: 1em; margin-left: 3px; vertical-align: middle; background: #a4e7c2; animation: fx-pulse 1s steps(2) infinite; }
+    .fx-motion, .fx-lightbox-close {
+      font: inherit; cursor: pointer; color: #e8efff; border: 1px solid #7895bd; background: #18263c;
+      min-width: 36px; min-height: 36px; border-radius: 10px; padding: 6px 10px;
+    }
+    .fx-motion { flex: none; font-size: 18px; }
+    :is(button, a, summary, textarea):focus-visible { outline: 2px solid #a9d8ff; outline-offset: 4px; }
+    .shot { position: relative; padding-top: 26px; }
+    .shot::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 27px; border: 1px solid #53617a;
+      border-radius: 12px 12px 0 0; background: radial-gradient(circle at 16px 13px, #f8a5a5 3px, transparent 4px), radial-gradient(circle at 30px 13px, #efd18b 3px, transparent 4px), radial-gradient(circle at 44px 13px, #8ee1ae 3px, transparent 4px), #1b273b;
+      pointer-events: none;
+    }
+    .shot img, .shot video { border-radius: 0 0 12px 12px; }
+    .fx-image-trigger { display: block; padding: 0; border: 0; border-radius: 0 0 12px 12px; width: 100%; background: transparent; cursor: zoom-in; transition: transform 200ms ease; }
+    .fx-image-trigger img { width: 100%; }
+    .fx-lightbox {
+      margin: auto; max-width: 96vw; max-height: 94vh; padding: 48px 12px 12px; border: 1px solid #8da6ce; border-radius: 16px;
+      background: #101929; color: #edf4ff; box-shadow: 0 30px 100px #000b;
+    }
+    .fx-lightbox::backdrop { background: #030811e8; }
+    .fx-lightbox img { display: block; max-width: 90vw; max-height: 78vh; object-fit: contain; }
+    .fx-lightbox-close { position: absolute; right: 12px; top: 8px; }
+    .fx-confetti { position: fixed; inset: 0; z-index: 100; pointer-events: none; overflow: clip; }
+    .fx-confetti i { position: absolute; top: -20px; width: 7px; height: 12px; animation: fx-confetti 1.5s ease-in forwards; }
+    @keyframes fx-float { 0%, 100% { transform: translateY(3px) rotate(-2deg); } 50% { transform: translateY(-8px) rotate(2deg); } }
+    @keyframes fx-drift { to { transform: translate(12%, 15%) scale(1.12); opacity: 0.85; } }
+    @keyframes fx-pulse { 50% { opacity: 0.55; } }
+    @keyframes fx-orbit { to { transform: rotate(360deg); } }
+    @keyframes fx-sweep { to { transform: translateX(100%); } }
+    @keyframes fx-pop { from { transform: scale(0.65); } to { transform: scale(1); } }
+    @keyframes fx-confetti { to { transform: translate(var(--fx-fall), 100vh) rotate(540deg); opacity: 0; } }
+    @media (hover: hover) and (pointer: fine) {
+      .crit-card:hover, .resource-card:hover, .mcp-lab .stage:hover { transform: translateY(-3px); border-color: #9ab3e4; }
+      .fx-image-trigger:hover, .shot video:hover { transform: translateY(-2px); }
+    }
+    @media (max-width: 1080px) { .cl-topbar { flex-wrap: wrap; } .cl-progress { margin-left: auto; } }
+    @media (max-width: 720px) {
+      .cl-topbar { gap: 10px; }
+      .cl-topbar-left { flex: 1 1 100%; }
+      .cl-progress { width: 100%; justify-content: space-between; gap: 8px; }
+      .cl-topbar-title h1 { font-size: 1.04rem; }
+      .cl-step h2 { font-size: 2rem; }
+      .overview-figure { flex-direction: column; gap: 4px; padding: 20px 10px; }
+      .fx-pilot { flex-basis: 200px; }
+      .fx-bubble { flex: none; width: 100%; max-width: 330px; font-size: 0.75rem; min-height: 80px; }
+      .workshop-contact { min-width: 0; }
+    }
+    html[data-fx-paused] *, html[data-fx-paused] *::before, html[data-fx-paused] *::after { animation-play-state: paused !important; }
+    html[data-fx-paused] .fx-bubble { visibility: hidden; }
+    html[data-fx-paused] .fx-tilt { transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+      .fx-bubble, .fx-motion { display: none; }
+      .fx-tilt { transform: none; }
+    }
+    @media print {
+      [data-fx-decorative], .fx-motion, .fx-lightbox, .fx-confetti { display: none !important; }
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+      .fx-tilt { transform: none; }
+      .cl-step h2 .accent { background: none; -webkit-text-fill-color: currentColor; }
+      .fx-image-trigger { display: block; }
+      .shot { padding-top: 0; } .shot::before { display: none; }
+    }
+    /* ============ End mission control ============ */
   </style>
 </head>
 
@@ -1952,6 +2128,215 @@ Report prioritised P0-P3 findings with source and test file:line evidence, what 
       Array.prototype.forEach.call(document.querySelectorAll(".tpl"), function (box) {
         var field = box.querySelector("textarea");
         if (field) { attach(box, function () { return field.value; }); }
+      });
+    })();
+  </script>
+  <script data-fx>
+    /* Mission control: optional effects, independent of workshop routing. */
+    (function () {
+      "use strict";
+      var root = document.documentElement;
+      var reduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+      var fine = window.matchMedia("(hover: hover) and (pointer: fine)");
+      var motionKey = "cl-explore-automations-motion-v1";
+      var paused = false;
+      try { paused = localStorage.getItem(motionKey) === "paused"; }
+      catch (error) { console.warn("Animation preference could not be read.", error); }
+
+      function element(tag, className, decorative) {
+        var node = document.createElement(tag);
+        node.setAttribute("data-fx", "");
+        node.className = className || "";
+        if (decorative) {
+          node.setAttribute("data-fx-decorative", "");
+          node.setAttribute("aria-hidden", "true");
+        }
+        return node;
+      }
+
+      var ambient = element("div", "fx-ambient", true);
+      for (var a = 0; a < 3; a++) { ambient.appendChild(element("div", "fx-aurora", true)); }
+      document.body.prepend(ambient);
+      var toggle = element("button", "fx-motion");
+      toggle.type = "button";
+      document.querySelector(".cl-progress").appendChild(toggle);
+      var hero = document.querySelector(".overview-figure");
+      var mascot = hero.querySelector(".mascot");
+      var pilot = element("div", "fx-pilot");
+      var tilt = element("div", "fx-tilt");
+      mascot.before(pilot);
+      pilot.appendChild(tilt);
+      tilt.appendChild(mascot);
+      ["left", "right"].forEach(function (side) {
+        tilt.appendChild(element("span", "fx-eye fx-eye-" + side, true));
+      });
+      var orbit = element("div", "fx-orbit", true);
+      ["#8aefbd", "#9bcaff", "#d2b7ff"].forEach(function (color) {
+        var dot = element("span", "fx-orbit-dot", true);
+        dot.style.setProperty("--dot", color);
+        orbit.appendChild(dot);
+      });
+      pilot.prepend(orbit);
+      pilot.prepend(element("div", "fx-orbit fx-orbit-inner", true));
+      var bubble = element("div", "fx-bubble", true);
+      var typingText = element("span", "", true);
+      bubble.append(typingText, element("span", "fx-caret", true));
+      hero.appendChild(bubble);
+      var lines = [
+        "Reading the issue\u2026", "Planning the changes\u2026",
+        "Opening a merge-ready pull request\u2026", "Automating the repeat work\u2026"
+      ];
+      var line = 0;
+      var letter = 0;
+      var erasing = false;
+      var typingTimer = 0;
+      var confettiTimer = 0;
+      var burst = null;
+      var active = document.querySelector(".cl-step.is-active");
+      var entrances = [];
+      var printing = false;
+
+      function running() { return !paused && !reduced.matches && !document.hidden && !printing; }
+      function typing() {
+        if (!running() || active.id !== "welcome") { return; }
+        letter += erasing ? -1 : 1;
+        typingText.textContent = lines[line].slice(0, letter);
+        pilot.classList.toggle("fx-typing", !erasing);
+        var delay = erasing ? 30 : 65;
+        if (letter === lines[line].length) { erasing = true; delay = 2000; }
+        else if (letter === 0) { erasing = false; line = (line + 1) % lines.length; delay = 450; }
+        typingTimer = window.setTimeout(typing, delay);
+      }
+      function clearBurst() {
+        window.clearTimeout(confettiTimer);
+        if (burst) { burst.remove(); burst = null; }
+        document.querySelector(".cl-finished").classList.remove("fx-celebrate");
+      }
+      function syncMotion() {
+        var off = !running();
+        root.toggleAttribute("data-fx-paused", off);
+        toggle.setAttribute("aria-pressed", String(paused));
+        toggle.setAttribute("aria-label", paused ? "Play animations" : "Pause animations");
+        toggle.title = toggle.getAttribute("aria-label");
+        toggle.textContent = paused ? "\u25b6" : "\u2161";
+        window.clearTimeout(typingTimer);
+        if (off) {
+          clearBurst();
+          entrances.forEach(function (animation) { animation.cancel(); });
+          pilot.classList.remove("fx-typing");
+        } else { typingTimer = window.setTimeout(typing, 350); }
+      }
+      toggle.addEventListener("click", function () {
+        paused = !paused;
+        try { localStorage.setItem(motionKey, paused ? "paused" : "playing"); }
+        catch (error) { console.warn("Animation preference could not be saved.", error); }
+        syncMotion();
+      });
+      reduced.addEventListener("change", syncMotion);
+      document.addEventListener("visibilitychange", syncMotion);
+      window.addEventListener("beforeprint", function () { printing = true; syncMotion(); });
+      window.addEventListener("afterprint", function () { printing = false; syncMotion(); });
+      syncMotion();
+
+      function celebrate() {
+        if (!running()) { return; }
+        clearBurst();
+        burst = element("div", "fx-confetti", true);
+        for (var i = 0; i < 32; i++) {
+          var piece = element("i", "", true);
+          piece.style.left = (Math.random() * 100) + "%";
+          piece.style.background = ["#8aefbd", "#9bcaff", "#d2b7ff"][i % 3];
+          piece.style.setProperty("--fx-fall", (Math.random() * 200 - 100) + "px");
+          piece.style.animationDelay = (Math.random() * 0.15) + "s";
+          burst.appendChild(piece);
+        }
+        document.body.appendChild(burst);
+        document.querySelector(".cl-finished").classList.add("fx-celebrate");
+        confettiTimer = window.setTimeout(clearBurst, 1700);
+      }
+      new MutationObserver(function () {
+        var next = document.querySelector(".cl-step.is-active");
+        if (!next || next === active) { return; }
+        active = next;
+        clearBurst();
+        syncMotion();
+        entrances.forEach(function (animation) { animation.cancel(); });
+        entrances = [];
+        if (running()) {
+          Array.prototype.forEach.call(active.children, function (child, i) {
+            entrances.push(child.animate([
+              { opacity: 0.35, transform: "translateY(12px)" },
+              { opacity: 1, transform: "translateY(0)" }
+            ], { duration: 300, delay: Math.min(i * 25, 125), easing: "ease-out" }));
+          });
+          if (active.id === "wrap") { celebrate(); }
+        }
+      }).observe(document.querySelector(".cl-main"), { subtree: true, attributes: true, attributeFilter: ["class"] });
+
+      var pointerFrame = 0;
+      var pointer = null;
+      var spotlight = null;
+      var surfaces = ".crit-card, .stage, .sowhat, .checkpoint, .resource-card, .meta-card";
+      document.addEventListener("pointermove", function (event) {
+        if (!fine.matches || !running()) { return; }
+        pointer = { x: event.clientX, y: event.clientY, target: event.target };
+        if (pointerFrame) { return; }
+        pointerFrame = requestAnimationFrame(function () {
+          pointerFrame = 0;
+          if (!running()) { return; }
+          var card = pointer.target.closest(surfaces);
+          if (spotlight && spotlight !== card) {
+            spotlight.style.removeProperty("--fx-x");
+            spotlight.style.removeProperty("--fx-y");
+          }
+          spotlight = card;
+          if (card) {
+            var box = card.getBoundingClientRect();
+            card.style.setProperty("--fx-x", (pointer.x - box.left) + "px");
+            card.style.setProperty("--fx-y", (pointer.y - box.top) + "px");
+          }
+          var heroBox = hero.getBoundingClientRect();
+          var inside = pointer.x >= heroBox.left && pointer.x <= heroBox.right && pointer.y >= heroBox.top && pointer.y <= heroBox.bottom;
+          tilt.style.setProperty("--fx-rx", inside ? ((0.5 - (pointer.y - heroBox.top) / heroBox.height) * 16) + "deg" : "0deg");
+          tilt.style.setProperty("--fx-ry", inside ? (((pointer.x - heroBox.left) / heroBox.width - 0.5) * 16) + "deg" : "0deg");
+        });
+      }, { passive: true });
+
+      var dialog = element("dialog", "fx-lightbox");
+      var close = element("button", "fx-lightbox-close");
+      close.type = "button";
+      close.textContent = "Close";
+      var zoomed = element("img", "");
+      dialog.append(close, zoomed);
+      document.body.appendChild(dialog);
+      var trigger = null;
+      close.addEventListener("click", function () { dialog.close(); });
+      dialog.addEventListener("click", function (event) {
+        if (event.target !== dialog) { return; }
+        var box = dialog.getBoundingClientRect();
+        if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) { dialog.close(); }
+      });
+      dialog.addEventListener("close", function () { if (trigger) { trigger.focus({ preventScroll: true }); } });
+      document.addEventListener("keydown", function (event) {
+        if (dialog.open && (event.key === "ArrowRight" || event.key === "ArrowLeft")) {
+          event.stopImmediatePropagation();
+          event.preventDefault();
+        }
+      }, true);
+      document.querySelectorAll(".shot img").forEach(function (image) {
+        var button = element("button", "fx-image-trigger");
+        button.type = "button";
+        button.setAttribute("aria-label", "Enlarge image: " + image.alt);
+        button.setAttribute("aria-haspopup", "dialog");
+        image.before(button);
+        button.appendChild(image);
+        button.addEventListener("click", function () {
+          trigger = button;
+          zoomed.src = image.src;
+          zoomed.alt = image.alt;
+          dialog.setAttribute("aria-label", image.alt);
+          dialog.showModal();
+        });
       });
     })();
   </script>
