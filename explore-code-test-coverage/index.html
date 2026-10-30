@@ -1,0 +1,2014 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="A hands-on workshop for developers: use GitHub Copilot to run an unfamiliar repository, map it with a skill, find its test gaps and add one verified test.">
+  <title>Explore Unfamiliar Code and Improve Test Coverage with GitHub Copilot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="../theme.css">
+  <style>
+    :root {
+      --workshop-bg: #0d1117;
+      --workshop-border: rgba(255, 255, 255, 0.1);
+      --workshop-text: #f8fafc;
+      --workshop-muted: #cbd5e1;
+      --workshop-faint: #94a3b8;
+      --workshop-green: #4ade80;
+      --workshop-blue: #60a5fa;
+      --workshop-purple: #a78bfa;
+      --workshop-amber: #fbbf24;
+      --workshop-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+      --workshop-radius: 24px;
+      --workshop-card-gap: 18px;
+      --workshop-content-width: 1180px;
+      --workshop-ease: cubic-bezier(0.16, 1, 0.3, 1);
+      /* lets the stage disclosures animate to their natural height */
+      interpolate-size: allow-keywords;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Inter", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(96, 165, 250, 0.14), transparent 32%),
+        radial-gradient(circle at top right, rgba(167, 139, 250, 0.1), transparent 28%),
+        var(--workshop-bg);
+      color: var(--workshop-text);
+    }
+
+    a {
+      color: inherit;
+    }
+
+    code {
+      font-family: "JetBrains Mono", monospace;
+    }
+
+    /* ============ Codelab shell ============ */
+    .cl-app {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .cl-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      padding: 14px clamp(16px, 3vw, 34px);
+      background: rgba(10, 14, 22, 0.9);
+      border-bottom: 1px solid var(--workshop-border);
+      backdrop-filter: blur(18px);
+    }
+
+    .cl-topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      font-size: 1rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .brand-mark svg {
+      fill: #e8eefc;
+    }
+
+    .cl-topbar-title {
+      min-width: 0;
+    }
+
+    .cl-topbar-title .kicker {
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.66rem;
+      font-weight: 700;
+      color: var(--workshop-green);
+      margin-bottom: 2px;
+    }
+
+    .cl-topbar-title h1 {
+      margin: 0;
+      font-size: clamp(0.98rem, 1.5vw, 1.24rem);
+      line-height: 1.2;
+      letter-spacing: -0.01em;
+    }
+
+    .cl-progress {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-shrink: 0;
+    }
+
+    .cl-progress-meta {
+      text-align: right;
+      line-height: 1.25;
+    }
+
+    .cl-progress-count {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--workshop-text);
+    }
+
+    .cl-progress-remaining {
+      display: block;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.74rem;
+      color: var(--workshop-faint);
+    }
+
+    .cl-progress-track {
+      width: min(240px, 26vw);
+      height: 8px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      overflow: hidden;
+    }
+
+    .cl-progress-fill {
+      height: 100%;
+      width: 100%;
+      transform: scaleX(0);
+      transform-origin: left center;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--workshop-green), var(--workshop-blue));
+      transition: transform 0.35s var(--workshop-ease);
+    }
+
+    .cl-progress-fill.is-complete {
+      animation: cl-progress-complete 0.7s ease both;
+    }
+
+    @keyframes cl-progress-complete {
+      0% {
+        filter: brightness(1);
+      }
+
+      45% {
+        filter: brightness(1.22);
+      }
+
+      100% {
+        filter: brightness(1);
+      }
+    }
+
+    .cl-body {
+      width: min(1500px, calc(100% - 48px));
+      margin: 0 auto;
+      padding: 32px 0 72px;
+      display: grid;
+      grid-template-columns: minmax(260px, 288px) minmax(0, 1fr);
+      gap: 32px;
+      align-items: start;
+    }
+
+    /* ============ Step rail ============ */
+    .cl-rail {
+      position: sticky;
+      top: 96px;
+      align-self: start;
+      background: rgba(10, 14, 22, 0.88);
+      border: 1px solid var(--workshop-border);
+      border-radius: var(--workshop-radius);
+      box-shadow: var(--workshop-shadow);
+      padding: 18px;
+      backdrop-filter: blur(18px);
+    }
+
+    .cl-rail-label {
+      margin: 0 0 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--workshop-faint);
+    }
+
+    .cl-steps {
+      list-style: none;
+      margin: 0 0 18px;
+      padding: 0;
+      display: grid;
+      gap: 4px;
+      position: relative;
+    }
+
+    .cl-steps li {
+      position: relative;
+    }
+
+    /* One highlight travels between steps; script measures its box. Without script each step keeps its own. */
+    .cl-steps.has-marker::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      box-sizing: border-box;
+      width: var(--marker-w, 0);
+      height: var(--marker-h, 0);
+      transform: translate(var(--marker-x, 0), var(--marker-y, 0));
+      border: 1px solid rgba(96, 165, 250, 0.28);
+      border-radius: 14px;
+      background: rgba(96, 165, 250, 0.12);
+      pointer-events: none;
+      transition: transform 0.35s var(--workshop-ease);
+    }
+
+    .cl-steps.has-marker.is-placing::before {
+      transition: none;
+    }
+
+    .cl-step-item {
+      width: 100%;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      display: grid;
+      grid-template-columns: 36px minmax(0, 1fr) auto;
+      gap: 12px;
+      align-items: center;
+      min-height: 56px;
+      padding: 9px 10px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--workshop-muted);
+      transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+    }
+
+    .cl-step-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .cl-step-item:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+    }
+
+    .cl-step-item.is-active {
+      background: rgba(96, 165, 250, 0.12);
+      border-color: rgba(96, 165, 250, 0.28);
+      color: var(--workshop-text);
+    }
+
+    .cl-steps.has-marker .cl-step-item.is-active {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .cl-step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--workshop-border);
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+      font-size: 0.86rem;
+      color: var(--workshop-faint);
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+    }
+
+    .cl-step-item.is-active .cl-step-num {
+      background: rgba(96, 165, 250, 0.2);
+      border-color: rgba(96, 165, 250, 0.42);
+      color: var(--workshop-blue);
+    }
+
+    .cl-step-item.is-done .cl-step-num {
+      background: rgba(74, 222, 128, 0.16);
+      border-color: rgba(74, 222, 128, 0.4);
+      color: var(--workshop-green);
+    }
+
+    .cl-step-num .digit,
+    .cl-step-num .tick {
+      grid-area: 1 / 1;
+      transition: opacity 0.26s ease, transform 0.42s var(--workshop-ease);
+    }
+
+    .cl-step-num .tick {
+      opacity: 0;
+      transform: scale(0.4) rotate(-12deg);
+    }
+
+    .cl-step-item.is-done .cl-step-num .digit {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+
+    .cl-step-item.is-done .cl-step-num .tick {
+      opacity: 1;
+      transform: scale(1) rotate(0);
+    }
+
+    .cl-step-name {
+      font-size: 0.94rem;
+      font-weight: 600;
+      line-height: 1.2;
+    }
+
+    .cl-step-time {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.72rem;
+      color: var(--workshop-faint);
+      white-space: nowrap;
+    }
+
+    .cl-rail-meta {
+      display: grid;
+      gap: 10px;
+      border-top: 1px solid var(--workshop-border);
+      padding-top: 16px;
+    }
+
+    .meta-card {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(13, 18, 28, 0.98));
+      border: 1px solid var(--workshop-border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .meta-label {
+      display: block;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--workshop-faint);
+      margin-bottom: 5px;
+    }
+
+    .meta-value {
+      font-size: 0.96rem;
+      font-weight: 700;
+    }
+
+    /* ============ Main / steps ============ */
+    .cl-main {
+      min-width: 0;
+      width: 100%;
+      max-width: var(--workshop-content-width);
+      justify-self: center;
+    }
+
+    .cl-step {
+      display: none;
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(13, 18, 28, 0.98));
+      border: 1px solid var(--workshop-border);
+      border-radius: var(--workshop-radius);
+      box-shadow: var(--workshop-shadow);
+      padding: clamp(28px, 3.2vw, 48px);
+    }
+
+    /* Focus is moved here programmatically for screen-reader step announcement;
+     the article is never keyboard-Tab-reachable (tabindex="-1"), so suppress the
+     default focus ring that would otherwise draw around the whole step. */
+    .cl-step:focus {
+      outline: none;
+    }
+
+    .cl-step.is-active {
+      display: block;
+      animation: cl-fade 0.42s var(--workshop-ease);
+    }
+
+    @keyframes cl-fade {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cl-duration {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(74, 222, 128, 0.1);
+      border: 1px solid rgba(74, 222, 128, 0.22);
+      color: var(--workshop-green);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.82rem;
+      margin-bottom: 16px;
+    }
+
+    .cl-step h2 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.5rem);
+      line-height: 1.06;
+      letter-spacing: -0.03em;
+      text-wrap: balance;
+    }
+
+    .cl-step h2 .accent {
+      color: var(--workshop-green);
+    }
+
+    /* ============ Opening mascot ============ */
+    .overview-figure {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px 0 28px;
+    }
+
+    .overview-figure .mascot {
+      width: clamp(180px, 18vw, 230px);
+    }
+
+    /* ============ Wrap-up cards ============ */
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--workshop-card-gap);
+      margin-top: 16px;
+    }
+
+    .resource-card {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 20px;
+      border: 1px solid var(--workshop-border);
+      border-top: 3px solid var(--resource-accent, var(--workshop-blue));
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(22, 31, 46, 0.9), rgba(16, 24, 38, 0.96));
+    }
+
+    .resource-card h4 {
+      margin: 0;
+      font-size: 1.05rem;
+      color: var(--workshop-text);
+    }
+
+    .resource-card .resource-go {
+      margin-top: auto;
+      padding-top: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--resource-accent, var(--workshop-blue));
+    }
+
+    /* ============ Step nav footer ============ */
+    .cl-nav {
+      display: flex;
+      justify-content: space-between;
+      gap: 14px;
+      margin-top: 36px;
+      padding-top: 26px;
+      border-top: 1px solid var(--workshop-border);
+    }
+
+    .cl-btn {
+      appearance: none;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      border: 1px solid var(--workshop-border);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--workshop-text);
+      transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease, filter 0.2s ease, transform 0.12s ease;
+    }
+
+    .cl-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .cl-btn:active {
+      transform: translateY(1px) scale(0.985);
+    }
+
+    .cl-btn:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+    }
+
+    .cl-btn.cl-next {
+      background: linear-gradient(135deg, rgba(96, 165, 250, 0.3), rgba(167, 139, 250, 0.26));
+      border-color: rgba(96, 165, 250, 0.42);
+    }
+
+    .cl-btn.cl-next:hover {
+      filter: brightness(1.08);
+    }
+
+    .cl-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .cl-btn.is-hidden {
+      visibility: hidden;
+    }
+
+    .cl-finished {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 22px;
+      border-radius: 14px;
+      background: rgba(74, 222, 128, 0.16);
+      border: 1px solid rgba(74, 222, 128, 0.55);
+      color: var(--workshop-green);
+      font-weight: 700;
+    }
+
+    .cl-step.is-active .cl-finished {
+      animation: cl-finished-in 0.6s var(--workshop-ease) both;
+    }
+
+    @keyframes cl-finished-in {
+      from {
+        opacity: 0;
+        transform: translateY(6px) scale(0.96);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .cl-restart {
+      width: 100%;
+      margin: 4px 0 18px;
+      cursor: pointer;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 9px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--workshop-border);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--workshop-muted);
+      transition: background 0.2s ease, color 0.2s ease;
+    }
+
+    .cl-restart:hover {
+      background: rgba(255, 255, 255, 0.09);
+      color: var(--workshop-text);
+    }
+
+    .cl-restart:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+    }
+
+    .mcp-lab .mcp-lab-prompt {
+      margin: 14px 0 0;
+      padding: 14px 16px;
+      border-left: 3px solid var(--workshop-purple);
+      border-radius: 0 12px 12px 0;
+      background: rgba(124, 92, 255, 0.1);
+      color: var(--text);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.86rem;
+      line-height: 1.6;
+      transition: border-left-color 0.15s ease;
+    }
+
+    .mcp-lab .sec-title {
+      margin: 30px 0 8px;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
+    }
+
+    .mcp-lab .sec-note {
+      margin: 0 0 14px;
+      color: var(--workshop-muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+      max-width: 74ch;
+    }
+
+    .mcp-lab .sec-note strong {
+      color: var(--workshop-text);
+    }
+
+    .loop {
+      margin: 0 0 8px;
+      font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .loop span {
+      margin: 0 0.2em;
+      color: var(--workshop-green);
+    }
+
+    .mcp-lab .sc-text {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--workshop-border);
+      border-radius: 12px;
+      background: rgba(8, 13, 22, 0.7);
+      color: var(--workshop-text);
+      font: inherit;
+      font-size: 0.94rem;
+      line-height: 1.5;
+    }
+
+    .mcp-lab .sc-text {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    .mcp-lab .sc-text:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+    }
+
+    /* Focus and document cards */
+    .mcp-lab .crit-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 0 0 8px;
+    }
+
+    .mcp-lab .crit-grid.is-three {
+      margin: 0 0 22px;
+    }
+
+    /* Six inventory documents share one accent; the last one, CONCERNS.md, feeds the next step */
+    .mcp-lab .codebase-outputs {
+      --crit: var(--workshop-blue);
+    }
+
+    .mcp-lab .codebase-outputs > :last-child {
+      grid-column: 1 / -1;
+    }
+
+    .mcp-lab .crit-card {
+      display: grid;
+      gap: 6px;
+      align-content: start;
+      padding: 14px;
+      border: 1px solid color-mix(in srgb, var(--crit, var(--workshop-green)) 55%, transparent);
+      border-top: 4px solid var(--crit, var(--workshop-green));
+      border-radius: 16px;
+      background: color-mix(in srgb, var(--crit, var(--workshop-green)) 12%, rgba(16, 24, 38, 0.9));
+    }
+
+    .mcp-lab .crit-card b {
+      display: inline-grid;
+      place-items: center;
+      justify-self: start;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: var(--crit, var(--workshop-green));
+      color: var(--workshop-bg);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .mcp-lab .crit-card strong {
+      color: var(--workshop-text);
+      font-size: 0.98rem;
+      line-height: 1.25;
+    }
+
+    .mcp-lab .crit-card p {
+      margin: 0;
+      color: var(--workshop-muted);
+      font-size: 0.84rem;
+      line-height: 1.45;
+    }
+
+    .mcp-lab .tpl {
+      position: relative;
+      margin: 0;
+      border: 1px solid var(--workshop-border);
+      border-radius: 14px;
+      background: rgba(8, 13, 22, 0.7);
+      transition: border-color 0.15s ease;
+    }
+
+    .mcp-lab .tpl textarea {
+      display: block;
+      padding-right: 96px;
+    }
+
+    .mcp-lab .copy-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      appearance: none;
+      cursor: pointer;
+      padding: 5px 12px;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      border-radius: 10px;
+      background: rgba(96, 165, 250, 0.12);
+      color: var(--workshop-blue);
+      font-family: "Inter", sans-serif;
+      font-size: 0.76rem;
+      font-weight: 700;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+
+    .mcp-lab .copy-btn:hover {
+      background: rgba(96, 165, 250, 0.22);
+    }
+
+    .mcp-lab .copy-btn:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+    }
+
+    /* Copied: the button and the prompt it copied turn green together, so the room sees which prompt is on the clipboard */
+    .mcp-lab .copy-btn.is-copied {
+      border-color: rgba(74, 222, 128, 0.5);
+      background: rgba(74, 222, 128, 0.16);
+      color: var(--workshop-green);
+    }
+
+    .mcp-lab .tpl.is-copied {
+      border-color: rgba(74, 222, 128, 0.55);
+    }
+
+    .mcp-lab .mcp-lab-prompt.is-copied {
+      border-left-color: var(--workshop-green);
+    }
+
+    .mcp-lab .mcp-lab-prompt.has-copy {
+      position: relative;
+      padding-right: 88px;
+    }
+
+    /* Screenshots and recordings sit on the step itself, with no card around them */
+    .shot {
+      margin: 0;
+    }
+
+    .shot img,
+    .shot video {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      border: 1px solid var(--workshop-border);
+      border-radius: 12px;
+    }
+
+    .shot video {
+      width: 100%;
+      max-height: 70vh;
+    }
+
+    .shot figcaption {
+      margin-top: 10px;
+      color: var(--workshop-muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+    }
+
+    /* ============ Stages: collapsible parts of a step ============ */
+    .mcp-lab .stage {
+      margin: 0 0 14px;
+      border: 1px solid var(--workshop-border);
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(22, 31, 46, 0.9), rgba(16, 24, 38, 0.96));
+    }
+
+    .mcp-lab .stage>summary {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 18px;
+      border-radius: 18px;
+      cursor: pointer;
+      list-style: none;
+      transition: background-color 0.15s ease;
+    }
+
+    .mcp-lab .stage[open]>summary {
+      border-radius: 18px 18px 0 0;
+    }
+
+    .mcp-lab .stage>summary:hover {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .mcp-lab .stage>summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mcp-lab .stage>summary::after {
+      content: "+";
+      flex: none;
+      color: var(--workshop-green);
+      font-weight: 700;
+    }
+
+    .mcp-lab .stage[open]>summary::after {
+      content: "\2212";
+    }
+
+    .mcp-lab .stage>summary:focus-visible {
+      outline: 2px solid var(--workshop-blue);
+      outline-offset: 2px;
+      border-radius: 18px;
+    }
+
+    /* Stages ease open and shut where the browser supports it (Chromium); elsewhere they snap, as before.
+       Closing is quicker than opening. Kept as separate rules so an unsupported selector drops only itself. */
+    .mcp-lab .stage::details-content {
+      block-size: 0;
+      overflow: clip;
+      transition: block-size 0.22s var(--workshop-ease), content-visibility 0.22s allow-discrete;
+    }
+
+    .mcp-lab .stage[open]::details-content {
+      block-size: auto;
+      transition-duration: 0.32s;
+    }
+
+    .mcp-lab .stage-num {
+      display: grid;
+      flex: none;
+      width: 38px;
+      height: 38px;
+      place-items: center;
+      border-radius: 12px;
+      background: rgba(124, 92, 255, 0.16);
+      color: #c9bcff;
+      font-family: "JetBrains Mono", monospace;
+      font-weight: 700;
+    }
+
+    .mcp-lab .stage-title {
+      flex: 1;
+      min-width: 0;
+      color: var(--workshop-text);
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .mcp-lab .stage-time {
+      flex: none;
+      color: var(--workshop-faint);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.78rem;
+    }
+
+    .mcp-lab .stage-body {
+      display: grid;
+      gap: 14px;
+      padding: 0 18px 18px;
+    }
+
+    .mcp-lab .stage-body>p {
+      margin: 0;
+      color: var(--workshop-muted);
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .mcp-lab .stage-body>p strong {
+      color: var(--workshop-text);
+    }
+
+    @media (max-width: 900px) {
+      .mcp-lab .crit-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 720px) {
+      .mcp-lab .crit-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* ============ Responsive ============ */
+    @media (max-width: 1080px) {
+      .cl-body {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 20px;
+      }
+
+      .cl-rail {
+        position: sticky;
+        top: calc(var(--topbar-h, 62px) + 12px);
+        z-index: 30;
+        padding: 12px;
+      }
+
+      .cl-steps {
+        display: flex;
+        gap: 8px;
+        margin-bottom: 0;
+        overflow-x: auto;
+        overscroll-behavior-inline: contain;
+        scrollbar-width: thin;
+        scroll-snap-type: inline proximity;
+      }
+
+      .cl-steps li {
+        flex: 0 0 min(260px, 72vw);
+        scroll-snap-align: start;
+      }
+
+      .cl-step-item {
+        min-height: 52px;
+      }
+
+      .cl-rail-label,
+      .cl-restart,
+      .cl-rail-meta {
+        display: none;
+      }
+
+      .resource-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .overview-figure .mascot {
+        width: clamp(140px, 26vw, 180px);
+      }
+    }
+
+    @media (max-width: 720px) {
+      .cl-topbar {
+        align-items: flex-start;
+        padding: 12px 16px;
+      }
+
+      .cl-progress {
+        flex: none;
+      }
+
+      .cl-body {
+        width: min(100% - 24px, 1500px);
+        padding: 14px 0 40px;
+        gap: 14px;
+      }
+
+      .cl-rail {
+        top: calc(var(--topbar-h, 58px) + 8px);
+        margin-inline: -1px;
+      }
+
+      .cl-progress-track {
+        display: none;
+      }
+
+      .cl-steps li {
+        flex-basis: min(236px, 78vw);
+      }
+
+      .cl-step {
+        padding: 24px 20px 28px;
+        border-radius: 20px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      .cl-step.is-active,
+      .cl-progress-fill.is-complete,
+      .cl-step.is-active .cl-finished {
+        animation: none;
+      }
+
+      .cl-progress-fill,
+      .cl-restart,
+      .cl-step-num,
+      .cl-step-num .digit,
+      .cl-step-num .tick,
+      .cl-steps.has-marker::before,
+      .mcp-lab .stage>summary,
+      .mcp-lab .copy-btn,
+      .mcp-lab .tpl,
+      .mcp-lab .mcp-lab-prompt {
+        transition: none;
+      }
+
+      .mcp-lab .stage::details-content,
+      .mcp-lab .stage[open]::details-content {
+        transition: none;
+      }
+
+      .cl-btn:active {
+        transform: none;
+      }
+    }
+
+    /* ============ Callouts ============ */
+    .sowhat {
+      margin: 0 0 14px;
+      padding: 20px 24px;
+      border: 1px solid rgba(74, 222, 128, 0.45);
+      border-left: 6px solid #4ade80;
+      border-radius: 14px;
+      background: rgba(74, 222, 128, 0.12);
+      color: var(--workshop-text);
+      font-size: 1.1rem;
+      line-height: 1.55;
+    }
+
+    .sowhat-label {
+      display: block;
+      margin-bottom: 6px;
+      color: #4ade80;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .sowhat-head {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    /* The same callout, repeated at the top of steps 2 to 5 */
+    .sowhat.is-step {
+      margin: 0 0 24px;
+      padding: 16px 22px;
+      font-size: 1rem;
+      text-wrap: pretty;
+    }
+
+    .sowhat.is-step .sowhat-label {
+      margin-bottom: 4px;
+    }
+
+    .sowhat.is-step .sowhat-head {
+      margin-bottom: 4px;
+      font-size: 1.2rem;
+    }
+
+    .checkpoint {
+      display: grid;
+      gap: 4px;
+      margin: 24px 0 0;
+      padding: 18px 22px;
+      border: 1px solid rgba(251, 191, 36, 0.55);
+      border-left: 6px solid #fbbf24;
+      border-radius: 14px;
+      background: rgba(251, 191, 36, 0.14);
+      color: var(--workshop-text);
+    }
+
+    .checkpoint-label {
+      color: #fbbf24;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .checkpoint-head {
+      font-size: 1.3rem;
+      font-weight: 700;
+      line-height: 1.3;
+    }
+
+    .checkpoint p {
+      margin: 0;
+      font-size: 1.05rem;
+      line-height: 1.55;
+    }
+
+    /* ============ Print: reveal everything ============ */
+    @media print {
+      body {
+        background: #0d1117;
+      }
+
+      .cl-topbar,
+      .cl-rail,
+      .cl-nav {
+        display: none !important;
+      }
+
+      .cl-body {
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        display: block;
+      }
+
+      .cl-step {
+        display: block !important;
+        box-shadow: none;
+        break-inside: avoid;
+        margin-bottom: 18px;
+        animation: none;
+      }
+
+      .mcp-lab .stage::details-content {
+        block-size: auto !important;
+        content-visibility: visible !important;
+        transition: none !important;
+      }
+
+      .meta-card {
+        box-shadow: none;
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="cl-app">
+    <header class="cl-topbar">
+      <div class="cl-topbar-left">
+        <div class="brand-mark" role="img" aria-label="GitHub">
+          <svg viewBox="0 0 16 16" width="22" height="22" aria-hidden="true" focusable="false">
+            <path fill-rule="evenodd"
+              d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z">
+            </path>
+          </svg>
+        </div>
+        <div class="cl-topbar-title">
+          <span class="kicker">GitHub Copilot Workshop &middot; 1h 15m</span>
+          <h1>Explore Unfamiliar Code and Improve Test Coverage</h1>
+        </div>
+      </div>
+      <div class="cl-progress">
+        <div class="cl-progress-meta" role="status" aria-live="polite">
+          <span class="cl-progress-count" id="clCount">Step 1 of 5</span>
+          <span class="cl-progress-remaining" id="clRemaining">~75 min left</span>
+        </div>
+        <div class="cl-progress-track" role="progressbar" aria-label="Workshop progress" aria-valuemin="0"
+          aria-valuemax="100" aria-valuenow="0">
+          <div class="cl-progress-fill" id="clFill"></div>
+        </div>
+        <div class="workshop-contact">
+          <a class="workshop-contact-dm" href="https://github.com/kshitiz99" target="_blank"
+            rel="noopener noreferrer" title="Hosted by Kshitiz Agarwal. Issues? Reach out on GitHub"
+            aria-label="Hosted by Kshitiz Agarwal. Issues? Reach out on GitHub">
+            <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+              <path fill-rule="evenodd"
+                d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
+            </svg>
+            <span class="workshop-contact-text">
+              <span class="workshop-contact-kicker">Hosted by Kshitiz Agarwal</span>
+              <span class="workshop-contact-cta">Issues? Reach out</span>
+            </span>
+          </a>
+          <a class="workshop-contact-more"
+            href="https://apac-corp-se.github.io/se-resources/public/explore-code-test-coverage/" target="_blank"
+            rel="noopener noreferrer" title="Original workshop created by Roza Jiang"
+            aria-label="Original workshop created by Roza Jiang">
+            <span class="workshop-contact-more-text">Original by Roza Jiang</span> &#8599;
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <div class="cl-body">
+      <aside class="cl-rail">
+        <p class="cl-rail-label">Contents</p>
+        <ol class="cl-steps" id="clSteps" aria-label="Workshop steps">
+          <li><button class="cl-step-item" type="button" data-target="welcome">
+              <span class="cl-step-num"><span class="digit">1</span><span class="tick">&#10003;</span></span>
+              <span class="cl-step-name">Welcome and goals</span>
+              <span class="cl-step-time">5 min</span>
+            </button></li>
+          <li><button class="cl-step-item" type="button" data-target="good">
+              <span class="cl-step-num"><span class="digit">2</span><span class="tick">&#10003;</span></span>
+              <span class="cl-step-name">Meet the repository: Tailspin Toys</span>
+              <span class="cl-step-time">15 min</span>
+            </button></li>
+          <li><button class="cl-step-item" type="button" data-target="mcp">
+              <span class="cl-step-num"><span class="digit">3</span><span class="tick">&#10003;</span></span>
+              <span class="cl-step-name">Acquire codebase knowledge</span>
+              <span class="cl-step-time">20 min</span>
+            </button></li>
+          <li><button class="cl-step-item" type="button" data-target="round2">
+              <span class="cl-step-num"><span class="digit">4</span><span class="tick">&#10003;</span></span>
+              <span class="cl-step-name">Audit test gaps and add coverage</span>
+              <span class="cl-step-time">25 min</span>
+            </button></li>
+          <li><button class="cl-step-item" type="button" data-target="wrap">
+              <span class="cl-step-num"><span class="digit">5</span><span class="tick">&#10003;</span></span>
+              <span class="cl-step-name">Workshop summary and next steps</span>
+              <span class="cl-step-time">10 min</span>
+            </button></li>
+        </ol>
+
+        <button class="cl-restart" type="button" id="clRestart">&#8635; Restart workshop</button>
+
+        <div class="cl-rail-meta">
+          <div class="meta-card">
+            <span class="meta-label">Outcome</span>
+            <span class="meta-value">Understand the codebase and add meaningful tests with Copilot</span>
+          </div>
+        </div>
+      </aside>
+
+      <main class="cl-main">
+        <!-- Step 1: Welcome and goals -->
+        <article class="cl-step mcp-lab" id="welcome" data-minutes="5" tabindex="-1">
+          <div class="overview-figure">
+            <img class="mascot" src="../assets/copilot-mascot.png"
+              alt="GitHub Copilot mascot">
+          </div>
+
+          <span class="cl-duration">Welcome &middot; 5 min</span>
+          <h2 id="welcome-heading">Understand the code. <span class="accent">Trust the tests.</span></h2>
+
+          <div class="sowhat" role="note">
+            <span class="sowhat-label">So what</span>
+            <strong class="sowhat-head">Today you will learn how to explore an unfamiliar codebase and improve
+              test coverage.</strong>
+          </div>
+          <h3 class="sec-title">Our focus today</h3>
+          <div class="crit-grid">
+            <section class="crit-card" style="--crit: var(--workshop-green);">
+              <b>1</b>
+              <strong>Explore unfamiliar code</strong>
+              <p>Use Copilot to map the repository, find entry points and understand how the pieces fit together.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-blue);">
+              <b>2</b>
+              <strong>Find test coverage gaps</strong>
+              <p>Review existing tests and identify behaviours, edge cases and error paths that need coverage.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-purple);">
+              <b>3</b>
+              <strong>Add and verify tests</strong>
+              <p>Use Copilot to write meaningful tests, run them and check the results against the code.</p>
+            </section>
+          </div>
+
+          <h3 class="sec-title">What you need</h3>
+          <div class="crit-grid is-three">
+            <section class="crit-card" style="--crit: var(--workshop-green);">
+              <strong>GitHub Copilot access</strong>
+              <p>A GitHub account with access to GitHub Copilot.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-blue);">
+              <strong>The GitHub Copilot app</strong>
+              <p>Installed on your computer and signed in with that account.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-purple);">
+              <strong>Node.js 22.13 or later</strong>
+              <p>Tailspin Toys, the practice repository, runs on Node.js.</p>
+            </section>
+          </div>
+
+          <nav class="cl-nav">
+            <button class="cl-btn cl-back" type="button">&larr; Back</button>
+            <button class="cl-btn cl-next" type="button">Next &rarr;</button>
+          </nav>
+        </article>
+
+        <!-- Step 2: Introduce the workshop repository -->
+        <article class="cl-step mcp-lab" id="good" data-minutes="15" tabindex="-1">
+          <span class="cl-duration">Duration: 15 minutes</span>
+          <h2>Meet the repository: <span class="accent">Tailspin Toys</span></h2>
+
+          <section class="sowhat is-step" aria-labelledby="tailspin-repository">
+            <span class="sowhat-label" id="tailspin-repository">Today's repository</span>
+            <strong class="sowhat-head"><a href="https://github.com/github-samples/tailspin-toys"
+                target="_blank" rel="noopener noreferrer">github-samples / tailspin-toys &#8599;</a></strong>
+            <span>A public sample site for a fictional game crowdfunding company, built with Astro and a local
+              SQLite database. Treat it as code you have never seen before.</span>
+          </section>
+
+          <h3 class="sec-title">1. Create your own copy</h3>
+          <p class="sec-note">Work in your own repository so you can raise issues later. Open
+            <a href="https://github.com/github-samples/tailspin-toys" target="_blank"
+              rel="noopener noreferrer">github-samples/tailspin-toys &#8599;</a>, choose
+            <strong>Use this template</strong> &rarr; <strong>Create a new repository</strong>, keep the name
+            <strong>tailspin-toys</strong> and create it in your own account. GitHub may also open a few starter
+            issues in the new repository. You can ignore them.</p>
+
+          <h3 class="sec-title">2. Open your repository in the app</h3>
+          <figure class="shot">
+            <img src="assets/tailspin-toys-open-app.png"
+              alt="Tailspin Toys repository with the Code menu and Open the app option highlighted"
+              width="805" height="437">
+            <figcaption>Code &rarr; Local &rarr; Open the app. Use this menu on your new repository.</figcaption>
+          </figure>
+
+          <h3 class="sec-title">3. Allow the repository to be cloned</h3>
+          <figure class="shot">
+            <img src="assets/tailspin-toys-allow-clone.png"
+              alt="Clone repository confirmation dialog with the Allow button highlighted"
+              width="590" height="417">
+            <figcaption>Confirm your repository &rarr; Allow. Your own repository name appears in the dialog.</figcaption>
+          </figure>
+
+          <h3 class="sec-title">4. Find the repository in Sessions</h3>
+          <figure class="shot">
+            <img src="assets/tailspin-toys-sessions.png"
+              alt="App sidebar showing the repository under Sessions with No sessions yet"
+              width="713" height="437">
+            <figcaption>Sessions &rarr; your repository. The name in this screenshot may differ from yours.</figcaption>
+          </figure>
+
+          <h3 class="sec-title">5. Ask Copilot to run the app locally</h3>
+          <p class="sec-note">Start a new session for your <strong>tailspin-toys</strong> repository. Check that
+            <strong>Current checkout</strong> is selected, paste the prompt below and click the send arrow.</p>
+          <blockquote class="mcp-lab-prompt">please run this app locally</blockquote>
+          <figure class="shot">
+            <video controls playsinline preload="metadata" width="720" height="840"
+              aria-label="Recording showing the prompt please run this app locally being submitted to Copilot">
+              <source src="assets/tailspin-toys-run-locally.mp4" type="video/mp4">
+              Your browser does not support embedded video.
+              <a href="assets/tailspin-toys-run-locally.mp4">Open the recording</a>.
+            </video>
+            <figcaption>Send the prompt &rarr; Copilot starts a session to run the app locally.</figcaption>
+          </figure>
+
+          <h3 class="sec-title">6. Explore the running app</h3>
+          <p class="sec-note">Once Copilot confirms the app is running, open the local URL it provides
+            (<code>http://localhost:4321/</code> in this recording). Browse <strong>Featured Games</strong>, click
+            <strong>View details</strong> on a game, then use <strong>Back to all games</strong> to return to the
+            catalogue.</p>
+          <figure class="shot">
+            <video controls playsinline preload="metadata" width="2646" height="2140"
+              aria-label="Recording showing the running Tailspin Toys app, featured games, and a game details page">
+              <source src="assets/tailspin-toys-explore-running-app.mp4" type="video/mp4">
+              Your browser does not support embedded video.
+              <a href="assets/tailspin-toys-explore-running-app.mp4">Open the recording</a>.
+            </video>
+            <figcaption>Open the local app &rarr; View details &rarr; Back to all games</figcaption>
+          </figure>
+
+          <aside class="checkpoint" aria-label="Running app checkpoint">
+            <span class="checkpoint-label">Checkpoint</span>
+            <span class="checkpoint-head">Your app is running locally</span>
+            <ul>
+              <li>Your repository appears under Sessions.</li>
+              <li>You can open the local URL provided by Copilot and see Featured Games.</li>
+              <li>You can open a game's details and return with Back to all games.</li>
+            </ul>
+            <p>If any check fails, pause here and resolve it before moving on to codebase exploration.</p>
+          </aside>
+
+          <nav class="cl-nav">
+            <button class="cl-btn cl-back" type="button">&larr; Back</button>
+            <button class="cl-btn cl-next" type="button">Next &rarr;</button>
+          </nav>
+        </article>
+
+
+        <!-- Step 3: Explore the codebase with a skill -->
+        <article class="cl-step mcp-lab" id="mcp" data-minutes="20" tabindex="-1">
+          <span class="cl-duration">Duration: 20 minutes</span>
+          <h2>Acquire <span class="accent">codebase knowledge</span></h2>
+
+          <div class="sowhat is-step" role="note">
+            <span class="sowhat-label">So what</span>
+            <strong class="sowhat-head">Turn an unfamiliar repository into an evidence-backed map you can
+              use to plan better tests.</strong>
+            <span>The skill investigates the codebase, records what it can verify and flags what still needs an answer.</span>
+          </div>
+
+          <p class="sec-note"><strong>Awesome Copilot</strong> is a community library of guides, agents, skills and
+            tools for GitHub Copilot. Today we use one of its skills to understand Tailspin Toys.
+            <a href="https://awesome-copilot.github.com/" target="_blank"
+              rel="noopener noreferrer">Explore the library &#8599;</a></p>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">1</span><span class="stage-title">Ask Copilot to onboard you with the skill</span></summary>
+            <div class="stage-body">
+              <p><label for="codebase-onboarding-prompt">In your <strong>tailspin-toys</strong>
+                  session, copy this prompt into Copilot and send it:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="codebase-onboarding-prompt" rows="3" readonly
+                  spellcheck="false">onboard me to this repo with this skill https://awesome-copilot.github.com/skill/acquire-codebase-knowledge/</textarea>
+              </div>
+              <figure class="shot">
+                <video controls playsinline preload="metadata" width="2646" height="2140"
+                  aria-label="Recording showing the onboarding prompt with the Acquire Codebase Knowledge skill link being sent to Copilot">
+                  <source src="assets/tailspin-toys-onboard-with-skill.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-onboard-with-skill.mp4">Open the recording</a>.
+                </video>
+                <figcaption>Paste the onboarding prompt with the skill link &rarr; Send</figcaption>
+              </figure>
+            </div>
+          </details>
+
+          <h3 class="sec-title">What the skill produces</h3>
+          <p class="sec-note">One repository map. Seven documents in <code>docs/codebase/</code>.</p>
+          <div class="crit-grid codebase-outputs" role="list" aria-label="Seven codebase knowledge documents">
+            <section class="crit-card" role="listitem">
+              <strong>What's it built with?</strong>
+              <code>STACK.md</code>
+              <p>Languages, runtimes, frameworks and dependencies.</p>
+            </section>
+            <section class="crit-card" role="listitem">
+              <strong>Where does everything live?</strong>
+              <code>STRUCTURE.md</code>
+              <p>Folders, entry points and key files.</p>
+            </section>
+            <section class="crit-card" role="listitem">
+              <strong>How does it fit together?</strong>
+              <code>ARCHITECTURE.md</code>
+              <p>Components, boundaries and data flow.</p>
+            </section>
+            <section class="crit-card" role="listitem">
+              <strong>How is code written here?</strong>
+              <code>CONVENTIONS.md</code>
+              <p>Coding patterns and error handling.</p>
+            </section>
+            <section class="crit-card" role="listitem">
+              <strong>What does it connect to?</strong>
+              <code>INTEGRATIONS.md</code>
+              <p>Databases, external services and configuration.</p>
+            </section>
+            <section class="crit-card" role="listitem">
+              <strong>How is it tested?</strong>
+              <code>TESTING.md</code>
+              <p>Test tools, organisation and mocking patterns.</p>
+            </section>
+            <section class="crit-card" role="listitem" style="--crit: var(--workshop-amber);">
+              <strong>Where should we look next?</strong>
+              <code>CONCERNS.md</code>
+              <p>Evidence-backed risks, technical debt and coverage gaps &mdash; a starting point for our test planning.</p>
+            </section>
+          </div>
+          <p class="sec-note"><code>[TODO]</code> means unknown, not assumed.</p>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">2</span><span class="stage-title">Review the generated codebase documents</span></summary>
+            <div class="stage-body">
+              <figure class="shot">
+                <video controls playsinline preload="metadata" width="2646" height="2140"
+                  aria-label="Recording showing the generated Tailspin Toys codebase documents and Copilot's validation work">
+                  <source src="assets/tailspin-toys-review-codebase-knowledge.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-review-codebase-knowledge.mp4">Open the recording</a>.
+                </video>
+                <figcaption>Explore the generated documents in docs/codebase/.</figcaption>
+              </figure>
+            </div>
+          </details>
+
+          <aside class="checkpoint" aria-label="Codebase knowledge checkpoint">
+            <span class="checkpoint-label">Checkpoint</span>
+            <span class="checkpoint-head">Know where to start</span>
+            <p>You can locate all seven documents, trace a finding to the code and explain one candidate test gap.
+              Review the numbered <code>[ASK USER]</code> questions together; record unresolved answers explicitly.</p>
+          </aside>
+
+
+          <nav class="cl-nav">
+            <button class="cl-btn cl-back" type="button">&larr; Back</button>
+            <button class="cl-btn cl-next" type="button">Next &rarr;</button>
+          </nav>
+        </article>
+
+        <!-- Step 4: Audit test gaps and add coverage -->
+        <article class="cl-step mcp-lab" id="round2" data-minutes="25" tabindex="-1">
+          <span class="cl-duration">Duration: 25 minutes</span>
+          <h2>Find test gaps. <span class="accent">Add meaningful coverage.</span></h2>
+
+          <div class="sowhat is-step" role="note">
+            <span class="sowhat-label">So what</span>
+            <strong class="sowhat-head">A passing test suite does not prove every important behaviour.</strong>
+            <span>Use the codebase map to find missing or weak tests, then turn one verified gap into a regression test.</span>
+          </div>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">1</span><span class="stage-title">Meet the Test Gap Audit skill</span><span
+                class="stage-time">5 min</span></summary>
+            <div class="stage-body">
+              <p>Open <a href="https://awesome-copilot.github.com/skill/test-gap-audit/" target="_blank"
+                  rel="noopener noreferrer">Test Gap Audit on Awesome Copilot &#8599;</a>. This skill compares code
+                paths with what existing tests actually assert. It stays <strong>read-only</strong> until you
+                explicitly ask it to add tests.</p>
+              <div class="crit-grid is-three">
+                <section class="crit-card" style="--crit: var(--workshop-blue);">
+                  <b>1</b>
+                  <strong>Map the behaviour</strong>
+                  <p>Inspect source, existing tests and repository test conventions.</p>
+                </section>
+                <section class="crit-card" style="--crit: var(--workshop-amber);">
+                  <b>2</b>
+                  <strong>Rank the gaps</strong>
+                  <p>Prioritise by impact, with evidence and concrete test scenarios.</p>
+                </section>
+                <section class="crit-card" style="--crit: var(--workshop-green);">
+                  <b>3</b>
+                  <strong>Prove the behaviour</strong>
+                  <p>Prefer meaningful assertions over a higher coverage percentage alone.</p>
+                </section>
+              </div>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">2</span><span class="stage-title">Run a read-only audit of Tailspin Toys</span><span
+                class="stage-time">8 min</span></summary>
+            <div class="stage-body">
+              <figure class="shot">
+                <video controls playsinline preload="metadata" width="2646" height="2140"
+                  aria-label="Tailspin Toys test gap audit demonstration">
+                  <source src="assets/tailspin-toys-test-gap-audit.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-test-gap-audit.mp4">Open the recording</a>.
+                </video>
+              </figure>
+              <p><label for="test-gap-audit-prompt">Copy this audit prompt into Copilot:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="test-gap-audit-prompt" rows="8" readonly
+                  spellcheck="false">Audit this Tailspin Toys repository using this skill: https://awesome-copilot.github.com/skill/test-gap-audit/
+
+Use docs/codebase/TESTING.md and docs/codebase/CONCERNS.md as context, then verify against the current code and tests. Inventory the repository's testable surfaces before inspecting the highest-risk areas. Use the skill's coverage mapping script if available, and verify its leads before calling them confirmed gaps.
+
+Report prioritised P0-P3 findings with source and test file:line evidence, what the current tests prove, and specific proposed tests with key assertions. Separate confirmed gaps from inferred gaps. State surface counts, list areas surveyed but not deeply inspected, and record checks run or skipped. Do not change any files or add tests yet.</textarea>
+              </div>
+              <p>Read the report before acting. A file without a directly matching test may still be covered indirectly.
+                If the audit cannot finish in this session, use its list of areas not deeply inspected for a follow-up pass.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">3</span><span class="stage-title">Generate a local HTML audit report</span><span
+                class="stage-time">2 min</span></summary>
+            <div class="stage-body">
+              <p>Once the audit is complete, ask Copilot to turn the finalised findings into a simple local HTML page.
+                Save the report outside the repository to keep the audited files unchanged, then open it in your browser.</p>
+              <p><label for="test-gap-report-prompt">Copy this report prompt into Copilot:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="test-gap-report-prompt" rows="3" readonly
+                  spellcheck="false">Please generate the finalised report in a simple local html page</textarea>
+              </div>
+              <figure class="shot">
+                <img src="assets/tailspin-toys-html-audit-report.png"
+                  alt="Copilot session showing the request to generate the finalised test gap audit report in a simple local HTML page">
+              </figure>
+              <p>Keep the priorities, source evidence and checks run or skipped visible in the report.
+                Generating the report does not authorise implementing the suggested fixes or tests.</p>
+              <figure class="shot">
+                <video controls playsinline preload="metadata" width="1536" height="1070"
+                  aria-label="Recording of the local HTML test gap audit report">
+                  <source src="assets/tailspin-toys-html-report-walkthrough.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-html-report-walkthrough.mp4">Open the recording</a>.
+                </video>
+              </figure>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">4</span><span class="stage-title">Create GitHub issues for the P1 gaps</span><span
+                class="stage-time">10 min</span></summary>
+            <div class="stage-body">
+              <figure class="shot">
+                <video controls playsinline preload="metadata" width="1536" height="1070"
+                  aria-label="Recording showing the request to create two detailed GitHub issues for the P1 test gaps">
+                  <source src="assets/tailspin-toys-create-p1-issues.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-create-p1-issues.mp4">Open the recording</a>.
+                </video>
+              </figure>
+              <p><label for="test-gap-implementation-prompt">Copy this prompt into Copilot:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="test-gap-implementation-prompt" rows="2" readonly
+                  spellcheck="false">Create a detailed github issue for each of the P1 gaps in this repository</textarea>
+              </div>
+              <p>The recording asks for two issues because that audit found two P1 gaps. Your audit may rank gaps
+                differently, so create one issue per P1 gap in your report.</p>
+            </div>
+          </details>
+
+          <figure class="shot">
+            <img src="assets/tailspin-toys-published-p1-issues.png"
+              alt="Repository Issues tab showing two published issues: the database-explorer SQL guard gap and missing seedDatabase unit tests">
+            <figcaption>Example result: both P1 gaps are published as GitHub issues. Your titles will differ.</figcaption>
+          </figure>
+
+          <aside class="checkpoint" aria-label="Test gap audit checkpoint">
+            <span class="checkpoint-label">Checkpoint</span>
+            <span class="checkpoint-head">Raise your GitHub issues</span>
+            <ul>
+              <li>Create one GitHub issue in your own <strong>tailspin-toys</strong> repository for each P1 gap from
+                your audit.</li>
+              <li>Include the finding, source evidence and proposed tests in each issue.</li>
+              <li>Open the repository's Issues tab and confirm the issues are published, not just drafted in chat.</li>
+            </ul>
+          </aside>
+
+          <nav class="cl-nav">
+            <button class="cl-btn cl-back" type="button">&larr; Back</button>
+            <button class="cl-btn cl-next" type="button">Next &rarr;</button>
+          </nav>
+        </article>
+
+        <!-- Step 5: Workshop summary and next steps -->
+        <article class="cl-step mcp-lab" id="wrap" data-minutes="10" tabindex="-1">
+          <span class="cl-duration">Duration: 10 minutes</span>
+          <h2>From unfamiliar code to <span class="accent">meaningful tests</span></h2>
+
+          <div class="sowhat is-step" role="note">
+            <span class="sowhat-label">The takeaway</span>
+            <strong class="sowhat-head">Understand first. Audit with evidence. Add tests that prove behaviour.</strong>
+            <span>Copilot helps investigate and implement. You review the evidence, choose the gap and check the results.</span>
+          </div>
+
+          <h3 class="sec-title">The loop you can reuse</h3>
+          <p class="loop">Run&nbsp;<span aria-hidden="true">&rarr;</span> Map&nbsp;<span aria-hidden="true">&rarr;</span>
+            Audit&nbsp;<span aria-hidden="true">&rarr;</span> Choose&nbsp;<span aria-hidden="true">&rarr;</span>
+            Test&nbsp;<span aria-hidden="true">&rarr;</span> Verify</p>
+          <p class="sec-note">Repeat for the next behaviour or area that needs deeper inspection.</p>
+          <aside class="checkpoint" aria-label="Workshop summary checkpoint">
+            <span class="checkpoint-label">Before you finish</span>
+            <span class="checkpoint-head">Show the evidence, not just the output</span>
+            <ul>
+              <li>Show the running app and explain one path through it.</li>
+              <li>Trace a codebase document's finding back to its source.</li>
+              <li>Explain one confirmed test gap and the regression a proposed or added test would catch.</li>
+              <li>Show the focused test results, or clearly state what could not run and why.</li>
+            </ul>
+            <p>No measured before-and-after coverage? Do not claim a percentage improvement. Describe the behaviour
+              now protected and any work still outstanding.</p>
+          </aside>
+
+          <h3 class="sec-title">Keep these resources</h3>
+          <div class="resource-grid">
+            <section class="resource-card" style="--resource-accent: var(--workshop-green);">
+              <h4>Tailspin Toys</h4>
+              <a class="resource-go" href="https://github.com/github-samples/tailspin-toys" target="_blank"
+                rel="noopener noreferrer">Open the template &#8599;</a>
+            </section>
+            <section class="resource-card" style="--resource-accent: var(--workshop-blue);">
+              <h4>Acquire Codebase Knowledge</h4>
+              <a class="resource-go" href="https://awesome-copilot.github.com/skill/acquire-codebase-knowledge/"
+                target="_blank" rel="noopener noreferrer">Open the skill &#8599;</a>
+            </section>
+            <section class="resource-card" style="--resource-accent: var(--workshop-purple);">
+              <h4>Test Gap Audit</h4>
+              <a class="resource-go" href="https://awesome-copilot.github.com/skill/test-gap-audit/"
+                target="_blank" rel="noopener noreferrer">Open the skill &#8599;</a>
+            </section>
+          </div>
+          <h3 class="sec-title">Try it in your own repository</h3>
+          <p class="sec-note">Choose one unfamiliar area, map it, audit its tests and add one reviewed regression test.
+            Keep the change focused, record the checks and share unresolved questions with your team.</p>
+
+          <nav class="cl-nav">
+            <button class="cl-btn cl-back" type="button">&larr; Back</button>
+            <span class="cl-finished" role="status">Workshop complete &#10003;</span>
+          </nav>
+        </article>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      // Steps manage their own selection via the hash; the browser's native
+      // fragment scroll (and back/forward scroll restoration) would otherwise
+      // tuck the active step header under the sticky topbar. Keep scroll under
+      // our control so every entry path rests at the top like click-through.
+      if ("scrollRestoration" in history) { history.scrollRestoration = "manual"; }
+      var steps = Array.prototype.slice.call(document.querySelectorAll(".cl-step"));
+      var items = Array.prototype.slice.call(document.querySelectorAll(".cl-step-item"));
+      var fill = document.getElementById("clFill");
+      var countEl = document.getElementById("clCount");
+      var remainingEl = document.getElementById("clRemaining");
+      var track = document.querySelector(".cl-progress-track");
+      var N = steps.length;
+      var STORE_KEY = "cl-explore-code-test-coverage-progress-v1";
+
+      var minutes = steps.map(function (s) {
+        return parseInt(s.getAttribute("data-minutes"), 10) || 0;
+      });
+
+      var current = 0;
+      var visited = {};
+
+      function save() {
+        try {
+          localStorage.setItem(STORE_KEY, JSON.stringify({ current: current, visited: Object.keys(visited) }));
+        } catch (e) { /* ignore */ }
+      }
+
+      function load() {
+        try {
+          var raw = localStorage.getItem(STORE_KEY);
+          if (!raw) return;
+          var data = JSON.parse(raw);
+          if (data && typeof data.current === "number" && data.current >= 0 && data.current < N) {
+            current = data.current;
+          }
+          if (data && data.visited) {
+            data.visited.forEach(function (v) { visited[v] = true; });
+          }
+        } catch (e) { /* ignore */ }
+      }
+
+      function indexOfId(id) {
+        for (var i = 0; i < N; i++) {
+          if (steps[i].id === id) return i;
+        }
+        return -1;
+      }
+
+      // Keep the active pill visible when the rail collapses into a
+      // horizontal scroller on tablet/mobile. Scrolls only the rail track,
+      // never the page, so the desktop vertical rail is left untouched.
+      var railTrack = document.querySelector(".cl-steps");
+      function revealActiveInRail() {
+        if (!railTrack) return;
+        if (railTrack.scrollWidth <= railTrack.clientWidth + 1) return;
+        var el = items[current];
+        if (!el) return;
+        var pill = (el.closest && el.closest("li")) || el;
+        var trackRect = railTrack.getBoundingClientRect();
+        var pillRect = pill.getBoundingClientRect();
+        var delta = (pillRect.left + pillRect.width / 2) - (trackRect.left + trackRect.width / 2);
+        if (Math.abs(delta) < 2) return;
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        railTrack.scrollBy({ left: delta, behavior: reduce ? "auto" : "smooth" });
+      }
+
+      // One highlight glides between steps. Its box is measured from the active item, so it
+      // stays correct when the rail wraps, scrolls or changes font. Re-measures place it without gliding.
+      var markerReady = false;
+      function placeMarker(instant) {
+        var li = items[current] && items[current].parentNode;
+        if (!railTrack || !li) return;
+        if (instant) { railTrack.classList.add("is-placing"); }
+        railTrack.style.setProperty("--marker-x", li.offsetLeft + "px");
+        railTrack.style.setProperty("--marker-y", li.offsetTop + "px");
+        railTrack.style.setProperty("--marker-w", li.offsetWidth + "px");
+        railTrack.style.setProperty("--marker-h", li.offsetHeight + "px");
+        railTrack.classList.add("has-marker");
+        if (instant) {
+          void railTrack.offsetWidth; // flush, so the new box applies before transitions come back
+          railTrack.classList.remove("is-placing");
+        }
+      }
+
+      function render() {
+        steps.forEach(function (s, i) {
+          s.classList.toggle("is-active", i === current);
+        });
+        items.forEach(function (it, i) {
+          it.classList.toggle("is-active", i === current);
+          it.classList.toggle("is-done", !!visited[i] && i !== current);
+          if (i === current) { it.setAttribute("aria-current", "step"); }
+          else { it.removeAttribute("aria-current"); }
+        });
+
+        var pct = N > 1 ? (current / (N - 1)) * 100 : 100;
+        fill.style.transform = "scaleX(" + pct / 100 + ")";
+        fill.classList.toggle("is-complete", current === N - 1);
+        if (track) { track.setAttribute("aria-valuenow", Math.round(pct)); }
+        countEl.textContent = "Step " + (current + 1) + " of " + N;
+
+        if (current === N - 1) {
+          remainingEl.textContent = "Done";
+        } else {
+          var remaining = 0;
+          for (var j = current; j < N; j++) { remaining += minutes[j]; }
+          remainingEl.textContent = remaining > 0 ? "~" + remaining + " min left" : "Done";
+        }
+
+        var active = steps[current];
+        var back = active.querySelector(".cl-back");
+        var next = active.querySelector(".cl-next");
+        if (back) { back.classList.toggle("is-hidden", current === 0); }
+        if (next && !next.disabled) {
+          next.classList.toggle("is-hidden", current === N - 1);
+        }
+
+        placeMarker(!markerReady);
+        markerReady = true;
+      }
+
+      function go(i, markCurrentDone) {
+        if (i < 0 || i >= N) return;
+        if (markCurrentDone) { visited[current] = true; }
+        current = i;
+        if (window.location.hash !== "#" + steps[current].id) {
+          history.replaceState(null, "", "#" + steps[current].id);
+        }
+        save();
+        render();
+        var activeStep = steps[current];
+        if (activeStep && typeof activeStep.focus === "function") {
+          activeStep.focus({ preventScroll: true });
+        }
+        var reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollTo({ top: 0, behavior: reduceMotion ? "auto" : "smooth" });
+        revealActiveInRail();
+      }
+
+      // Wire Back / Next inside each step
+      steps.forEach(function (s) {
+        var back = s.querySelector(".cl-back");
+        var next = s.querySelector(".cl-next");
+        if (back) { back.addEventListener("click", function () { go(current - 1, false); }); }
+        if (next) {
+          next.addEventListener("click", function () {
+            if (next.disabled) return;
+            go(current + 1, true);
+          });
+        }
+      });
+
+      // Wire rail navigation (resolve target by id so rail order never drifts from steps)
+      items.forEach(function (it) {
+        it.addEventListener("click", function () {
+          var target = indexOfId(it.getAttribute("data-target"));
+          if (target < 0) return;
+          go(target, target > current);
+        });
+      });
+
+      // Restart clears saved progress, then returns to the first step (projector safety)
+      var restartBtn = document.getElementById("clRestart");
+      if (restartBtn) {
+        restartBtn.addEventListener("click", function () {
+          visited = {};
+          try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ }
+          go(0, false);
+        });
+      }
+
+      // Keyboard arrows
+      document.addEventListener("keydown", function (e) {
+        if (e.metaKey || e.ctrlKey || e.altKey) return;
+        var tag = (e.target && e.target.tagName) || "";
+        if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SUMMARY") return;
+        if (e.key === "ArrowRight") { go(current + 1, true); }
+        else if (e.key === "ArrowLeft") { go(current - 1, false); }
+      });
+
+      // Print and PDF export leave closed <details> blank, so open the stages while printing.
+      var printOpened = [];
+      window.addEventListener("beforeprint", function () {
+        printOpened = [];
+        Array.prototype.forEach.call(document.querySelectorAll("details.stage"), function (d) {
+          if (!d.open) { d.open = true; printOpened.push(d); }
+        });
+      });
+      window.addEventListener("afterprint", function () {
+        printOpened.forEach(function (d) { d.open = false; });
+        printOpened = [];
+      });
+
+      // React to hash changes (rail jumps, shared/deep links)
+      window.addEventListener("hashchange", function () {
+        var id = window.location.hash.replace("#", "");
+        var i = indexOfId(id);
+        if (i >= 0 && i !== current) { go(i, i > current); }
+      });
+
+      // Init
+      load();
+      var hashIndex = indexOfId(window.location.hash.replace("#", ""));
+      if (hashIndex >= 0) { current = hashIndex; }
+      for (var k = 0; k < current; k++) { visited[k] = true; }
+      render();
+      // Rest at the top like click-through navigation (go() scrolls to top), so the
+      // active step header clears the sticky topbar on deep-link / refresh.
+      function resetScroll() { window.scrollTo(0, 0); }
+      resetScroll();
+      requestAnimationFrame(resetScroll);
+      window.addEventListener("load", resetScroll);
+
+      // Rail sticky offset must clear the real topbar, which grows taller when
+      // the title wraps on narrow phones.
+      var topbar = document.querySelector(".cl-topbar");
+      function syncTopbarHeight() {
+        if (!topbar) return;
+        document.documentElement.style.setProperty("--topbar-h", topbar.offsetHeight + "px");
+      }
+      syncTopbarHeight();
+      if (topbar && typeof ResizeObserver === "function") {
+        new ResizeObserver(syncTopbarHeight).observe(topbar);
+      }
+      window.addEventListener("resize", syncTopbarHeight);
+      window.addEventListener("orientationchange", syncTopbarHeight);
+      requestAnimationFrame(revealActiveInRail);
+
+      // Re-measure the marker when the rail changes size or the fonts arrive.
+      if (railTrack && typeof ResizeObserver === "function") {
+        new ResizeObserver(function () { placeMarker(true); }).observe(railTrack);
+      } else {
+        window.addEventListener("resize", function () { placeMarker(true); });
+      }
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () { placeMarker(true); });
+      }
+    })();
+
+    // Copy buttons: prompts can be pasted straight into Copilot.
+    (function () {
+      function fallbackCopy(text) {
+        var ta = document.createElement("textarea");
+        ta.value = text;
+        ta.setAttribute("readonly", "");
+        ta.style.position = "fixed";
+        ta.style.opacity = "0";
+        document.body.appendChild(ta);
+        ta.select();
+        var ok = false;
+        try { ok = document.execCommand("copy"); } catch (e) { ok = false; }
+        document.body.removeChild(ta);
+        return ok;
+      }
+
+      function copyText(text, done) {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { done(true); }, function () { done(fallbackCopy(text)); });
+        } else {
+          done(fallbackCopy(text));
+        }
+      }
+
+      function attach(box, getText) {
+        var btn = document.createElement("button");
+        var timer = 0;
+        btn.type = "button";
+        btn.className = "copy-btn";
+        btn.textContent = "Copy";
+        btn.setAttribute("aria-live", "polite");
+        btn.addEventListener("click", function () {
+          copyText(getText(), function (ok) {
+            window.clearTimeout(timer);
+            btn.textContent = ok ? "Copied \u2713" : "Press Ctrl/Cmd+C";
+            btn.classList.toggle("is-copied", ok);
+            box.classList.toggle("is-copied", ok);
+            timer = window.setTimeout(function () {
+              btn.textContent = "Copy";
+              btn.classList.remove("is-copied");
+              box.classList.remove("is-copied");
+            }, 2000);
+          });
+        });
+        box.appendChild(btn);
+      }
+
+      Array.prototype.forEach.call(document.querySelectorAll(".mcp-lab-prompt"), function (box) {
+        box.classList.add("has-copy");
+        attach(box, function () {
+          var clone = box.cloneNode(true);
+          var own = clone.querySelector(".copy-btn");
+          if (own) { own.parentNode.removeChild(own); }
+          return clone.textContent.trim();
+        });
+      });
+
+      Array.prototype.forEach.call(document.querySelectorAll(".tpl"), function (box) {
+        var field = box.querySelector("textarea");
+        if (field) { attach(box, function () { return field.value; }); }
+      });
+    })();
+  </script>
+</body>
+
+</html>
