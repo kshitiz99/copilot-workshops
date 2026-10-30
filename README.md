@@ -6,7 +6,7 @@ Self-paced, step-by-step GitHub Copilot workshops, published with GitHub Pages.
 
 | Workshop | Link |
 | --- | --- |
-| Explore Unfamiliar Code and Improve Test Coverage | https://kshitiz99.github.io/copilot-workshops/explore-code-test-coverage/ |
+| Explore Unfamiliar Code and Improve Test Coverage | https://kshitiz99.github.io/copilot-workshops/explore-automations/ |
 
 ## Structure
 
@@ -20,7 +20,7 @@ assets/                            Shared images (mascot)
 
 ## Add a new workshop using the same template
 
-1. Copy `explore-code-test-coverage/` to a new folder, for example `my-new-workshop/`.
+1. Copy `explore-automations/` to a new folder, for example `my-new-workshop/`.
 2. In the new `index.html`:
    - Update `<title>`, the meta description, the topbar kicker (duration) and `<h1>`.
    - Edit the rail `<ol id="clSteps">`: one `<li>` per step, with `data-target` matching a step `id`.
@@ -34,7 +34,7 @@ assets/                            Shared images (mascot)
    - `figure.shot` for screenshots and `<video>` recordings
 4. Add a card for the workshop to the root `index.html`.
 
-Deep links work with `#<step-id>`, for example `.../explore-code-test-coverage/#round2`.
+Deep links work with `#<step-id>`, for example `.../explore-automations/#round2`.
 
 ## Credits
 
