@@ -6,7 +6,7 @@ Self-paced, step-by-step GitHub Copilot workshops, published with GitHub Pages.
 
 | Workshop | Link |
 | --- | --- |
-| Explore Unfamiliar Code and Improve Test Coverage | https://kshitiz99.github.io/copilot-workshops/explore-automations/ |
+| Explore agentic & autonomous workflows | https://kshitiz99.github.io/copilot-workshops/explore-automations/ |
 
 ## Structure
 
@@ -36,7 +36,7 @@ assets/                            Shared images (mascot)
 
 Deep links work with `#<step-id>`, for example `.../explore-automations/#round2`.
 
-## Credits
+## Maintainer
 
-Workshop template and original content created by Roza Jiang
-([original workshop](https://apac-corp-se.github.io/se-resources/public/explore-code-test-coverage/)).
+Created and maintained by [Kshitiz](https://www.linkedin.com/in/kshitiz-agarwal-5b7950155/).
+DM me for any issues.
