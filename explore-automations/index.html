@@ -1333,6 +1333,17 @@
       .fx-image-trigger { display: block; }
       .shot { padding-top: 0; } .shot::before { display: none; }
     }
+    /* Issue planning: prompt summary and evidence timeline. */
+    #good #issue-plan-prompt { height: 170px; resize: none; }
+    #good .prompt-asks { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+    #good .prompt-asks li { padding: 6px 10px; border: 1px solid #5b7398; border-radius: 999px; background: #192a42; color: #d7e8ff; font-size: 0.8rem; }
+    #good .prompt-asks li:last-child { border-color: #77d5a7; background: #16372d; color: #a7f3cd; }
+    #good .plan-timeline { list-style: none; counter-reset: evidence; margin: 0; padding: 0; }
+    #good .plan-timeline li { position: relative; counter-increment: evidence; padding: 0 0 22px 48px; color: var(--workshop-muted); font-size: 0.94rem; line-height: 1.6; }
+    #good .plan-timeline li::before { content: counter(evidence); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; border: 1px solid #a68ae77a; background: linear-gradient(140deg, #514185, #233d60); color: #e5dcff; font-family: var(--font-display); font-weight: 700; }
+    #good .plan-timeline li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 36px; bottom: 6px; width: 1px; background: #7895bd66; }
+    #good .plan-timeline strong { color: var(--workshop-text); }
+    @media (max-width: 720px) { #good #issue-plan-prompt { height: 430px; } }
     /* ============ End mission control ============ */
   </style>
 </head>
@@ -1513,6 +1524,49 @@
               </figure>
             </div>
           </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">3</span><span class="stage-title">Ask for a plan before any code</span></summary>
+            <div class="stage-body">
+              <p>Your new session opens with the issue already attached. Ask Copilot to think before it codes: it researches the issue and your repository, then returns a plan for your approval.</p>
+              <p><label for="issue-plan-prompt">Check that <strong>Plan</strong> is selected, click <strong>Copy</strong>, then paste this exact prompt into your issue-linked session&rsquo;s message box and send it:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="issue-plan-prompt" rows="6" readonly spellcheck="false">Please prepare a comprehensive, well-structured plan to address this vulnerability, outlining the proposed approach, implementation steps, potential risks, and expected outcomes. Share the plan for my review and approval before proceeding with the implementation.</textarea>
+              </div>
+              <ul class="prompt-asks" aria-label="What this prompt asks Copilot for">
+                <li>Approach</li>
+                <li>Implementation steps</li>
+                <li>Potential risks</li>
+                <li>Expected outcomes</li>
+                <li>Your approval first</li>
+              </ul>
+              <figure class="shot">
+                <video controls playsinline preload="metadata" poster="assets/tailspin-toys-plan-from-issue-poster.jpg"
+                  width="1960" height="1246"
+                  aria-label="Recording of a Copilot session started from GitHub Issue #164: the planning prompt is sent and Copilot reviews the issue, repository guidance and relevant code before planning">
+                  <source src="assets/tailspin-toys-plan-from-issue.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-plan-from-issue.mp4">Open the recording</a>.
+                </video>
+                <figcaption>Send the planning prompt &rarr; Copilot researches the issue before proposing any change.</figcaption>
+              </figure>
+              <h3 class="sec-title">What you&rsquo;ll see in the recording</h3>
+              <ol class="plan-timeline">
+                <li><strong>The issue comes with you</strong> &mdash; Copilot prepares a dedicated worktree and starts the session with <strong>Issue #164</strong> attached above the composer and open beside the chat.</li>
+                <li><strong>Copilot commits to planning first</strong> &mdash; It promises to review the issue, its comments and artifacts, and the relevant code, then prepare a plan&mdash;without changing repository code before your approval.</li>
+                <li><strong>It gathers the evidence</strong> &mdash; Copilot reads the issue with <code>gh issue view</code>, inspects the worktree and checks project guidance such as <code>copilot-instructions.md</code>, <code>README.md</code>, <code>CONTRIBUTING.md</code> and <code>SECURITY.md</code>.</li>
+                <li><strong>It studies the code and tests</strong> &mdash; It opens the affected implementation and test setup, including <code>extension.mjs</code>, <code>package.json</code> and <code>vitest.config.ts</code>, and loads relevant skills such as <code>quality-checks</code>.</li>
+              </ol>
+              <p class="sec-note">This recording shows the submitted prompt and Copilot&rsquo;s initial research, not the finished plan or approval.</p>
+              <p class="sec-note">Your session may read different files, depending on the issue you chose.</p>
+            </div>
+          </details>
+
+          <aside class="checkpoint" aria-label="Plan review checkpoint">
+            <span class="checkpoint-label">Checkpoint</span>
+            <span class="checkpoint-head">Review before you approve</span>
+            <p>Expect a plan covering the approach, implementation steps, potential risks and expected outcomes. Copilot waits for your go-ahead before implementing anything.</p>
+          </aside>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
