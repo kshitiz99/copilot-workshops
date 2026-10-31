@@ -1408,7 +1408,7 @@
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="mcp">
               <span class="cl-step-num"><span class="digit">3</span><span class="tick">&#10003;</span></span>
-              <span class="cl-step-name">Acquire codebase knowledge</span>
+              <span class="cl-step-name">From code to merge-ready PRs</span>
               <span class="cl-step-time">20 min</span>
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="round2">
@@ -1608,107 +1608,30 @@
         </article>
 
 
-        <!-- Step 3: Explore the codebase with a skill -->
+        <!-- Step 3: Prepare a merge-ready pull request -->
         <article class="cl-step mcp-lab" id="mcp" data-minutes="20" tabindex="-1">
           <span class="cl-duration">Duration: 20 minutes</span>
-          <h2>Acquire <span class="accent">codebase knowledge</span></h2>
+          <h2>From code to <span class="accent">merge-ready PRs</span></h2>
 
           <div class="sowhat is-step" role="note">
             <span class="sowhat-label">So what</span>
-            <strong class="sowhat-head">Turn an unfamiliar repository into an evidence-backed map you can
-              use to plan better tests.</strong>
-            <span>The skill investigates the codebase, records what it can verify and flags what still needs an answer.</span>
+            <strong class="sowhat-head">Make your changes easy to understand, review and trust.</strong>
+            <span>A focused, validated pull request is ready for a merge decision&mdash;not an automatic merge or deployment.</span>
           </div>
 
-          <p class="sec-note"><strong>Awesome Copilot</strong> is a community library of guides, agents, skills and
-            tools for GitHub Copilot. Today we use one of its skills to understand Tailspin Toys.
-            <a href="https://awesome-copilot.github.com/" target="_blank"
-              rel="noopener noreferrer">Explore the library &#8599;</a></p>
+          <p class="sec-note">Once Copilot has implemented your approved plan, the next goal is a <strong>pull request (PR)</strong>:
+            a proposal to review the changes on your branch before merging them into the target branch.
+            It connects the work back to the issue and gives reviewers a clear place to understand, discuss and evaluate what changed.</p>
 
-          <details class="stage" open>
-            <summary><span class="stage-num">1</span><span class="stage-title">Ask Copilot to onboard you with the skill</span></summary>
-            <div class="stage-body">
-              <p><label for="codebase-onboarding-prompt">In your <strong>tailspin-toys</strong>
-                  session, copy this prompt into Copilot and send it:</label></p>
-              <div class="tpl">
-                <textarea class="sc-text" id="codebase-onboarding-prompt" rows="3" readonly
-                  spellcheck="false">onboard me to this repo with this skill https://awesome-copilot.github.com/skill/acquire-codebase-knowledge/</textarea>
-              </div>
-              <figure class="shot">
-                <video controls playsinline preload="metadata" width="2646" height="2140"
-                  aria-label="Recording showing the onboarding prompt with the Acquire Codebase Knowledge skill link being sent to Copilot">
-                  <source src="assets/tailspin-toys-onboard-with-skill.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                  <a href="assets/tailspin-toys-onboard-with-skill.mp4">Open the recording</a>.
-                </video>
-                <figcaption>Paste the onboarding prompt with the skill link &rarr; Send</figcaption>
-              </figure>
-            </div>
-          </details>
+          <p class="sec-note"><strong>Merge-ready means more than code that runs.</strong> The changes should address the issue and
+            agreed scope, with a review for correctness and unrelated edits. Relevant tests and required automated checks should pass,
+            reviewer feedback should be addressed, required approvals should be in place and merge conflicts should be resolved.
+            Together, these give your team evidence for a confident merge decision.</p>
 
-          <h3 class="sec-title">What the skill produces</h3>
-          <p class="sec-note">One repository map. Seven documents in <code>docs/codebase/</code>.</p>
-          <div class="crit-grid codebase-outputs" role="list" aria-label="Seven codebase knowledge documents">
-            <section class="crit-card" role="listitem">
-              <strong>What's it built with?</strong>
-              <code>STACK.md</code>
-              <p>Languages, runtimes, frameworks and dependencies.</p>
-            </section>
-            <section class="crit-card" role="listitem">
-              <strong>Where does everything live?</strong>
-              <code>STRUCTURE.md</code>
-              <p>Folders, entry points and key files.</p>
-            </section>
-            <section class="crit-card" role="listitem">
-              <strong>How does it fit together?</strong>
-              <code>ARCHITECTURE.md</code>
-              <p>Components, boundaries and data flow.</p>
-            </section>
-            <section class="crit-card" role="listitem">
-              <strong>How is code written here?</strong>
-              <code>CONVENTIONS.md</code>
-              <p>Coding patterns and error handling.</p>
-            </section>
-            <section class="crit-card" role="listitem">
-              <strong>What does it connect to?</strong>
-              <code>INTEGRATIONS.md</code>
-              <p>Databases, external services and configuration.</p>
-            </section>
-            <section class="crit-card" role="listitem">
-              <strong>How is it tested?</strong>
-              <code>TESTING.md</code>
-              <p>Test tools, organisation and mocking patterns.</p>
-            </section>
-            <section class="crit-card" role="listitem" style="--crit: var(--workshop-amber);">
-              <strong>Where should we look next?</strong>
-              <code>CONCERNS.md</code>
-              <p>Evidence-backed risks, technical debt and coverage gaps &mdash; a starting point for our test planning.</p>
-            </section>
-          </div>
-          <p class="sec-note"><code>[TODO]</code> means unknown, not assumed.</p>
-
-          <details class="stage" open>
-            <summary><span class="stage-num">2</span><span class="stage-title">Review the generated codebase documents</span></summary>
-            <div class="stage-body">
-              <figure class="shot">
-                <video controls playsinline preload="metadata" width="2646" height="2140"
-                  aria-label="Recording showing the generated Tailspin Toys codebase documents and Copilot's validation work">
-                  <source src="assets/tailspin-toys-review-codebase-knowledge.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                  <a href="assets/tailspin-toys-review-codebase-knowledge.mp4">Open the recording</a>.
-                </video>
-                <figcaption>Explore the generated documents in docs/codebase/.</figcaption>
-              </figure>
-            </div>
-          </details>
-
-          <aside class="checkpoint" aria-label="Codebase knowledge checkpoint">
-            <span class="checkpoint-label">Checkpoint</span>
-            <span class="checkpoint-head">Know where to start</span>
-            <p>You can locate all seven documents, trace a finding to the code and explain one candidate test gap.
-              Review the numbered <code>[ASK USER]</code> questions together; record unresolved answers explicitly.</p>
-          </aside>
-
+          <p class="sec-note">A clear PR summary explains <strong>what changed, why, how it was validated and any remaining risks</strong>.
+            Copilot can help refine the changes, test them and explain the results, but AI output or green checks alone do not guarantee readiness.
+            Repository rules and human review still govern the decision. The outcome is a focused, understandable, validated PR
+            ready for review and a merge decision&mdash;not an automatic merge or deployment.</p>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
