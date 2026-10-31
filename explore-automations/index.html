@@ -1371,6 +1371,20 @@
       #round2 .stage-body { gap: 18px; padding: 6px 18px 22px; }
       #round2 #release-notes-prompt { height: 700px; }
     }
+    #wrap .sec-note, #wrap .stage-body > p, #wrap .capstone-list, #wrap .checkpoint p { line-height: 1.7; }
+    #wrap .sec-note, #wrap .stage-body > p, #wrap .capstone-list { max-width: 70ch; }
+    #wrap > .sec-note { margin-bottom: 22px; }
+    #wrap .stage { margin-bottom: 22px; }
+    #wrap .stage-body { gap: 20px; padding: 8px 24px 24px; }
+    #wrap .stage > summary { padding: 18px 24px; }
+    #wrap .capstone-list { display: grid; gap: 12px; margin: 0; padding-left: 22px; color: var(--workshop-muted); }
+    #wrap .capstone-list strong { color: var(--workshop-text); }
+    #wrap .capstone-submit { justify-self: start; white-space: normal; line-height: 1.5; }
+    #wrap .checkpoint { margin-top: 24px; }
+    @media (max-width: 720px) {
+      #wrap .stage > summary { padding: 18px; }
+      #wrap .stage-body { gap: 18px; padding: 6px 18px 22px; }
+    }
     /* ============ End mission control ============ */
   </style>
 </head>
@@ -1841,53 +1855,106 @@ If nothing was merged, don't open a pull request; just say so.</textarea>
         <!-- Step 5: Workshop summary and next steps -->
         <article class="cl-step mcp-lab" id="wrap" data-minutes="10" tabindex="-1">
           <span class="cl-duration">Duration: 10 minutes</span>
-          <h2>From unfamiliar code to <span class="accent">meaningful tests</span></h2>
+          <h2>From workshop learning to <span class="accent">real-world impact</span></h2>
 
           <div class="sowhat is-step" role="note">
             <span class="sowhat-label">The takeaway</span>
-            <strong class="sowhat-head">Understand first. Audit with evidence. Add tests that prove behaviour.</strong>
-            <span>Copilot helps investigate and implement. You review the evidence, choose the gap and check the results.</span>
+            <strong class="sowhat-head">Take the learning into your everyday work.</strong>
+            <span>Choose a real challenge, turn it into a useful automation and bring its results to our final workshop.</span>
           </div>
 
-          <h3 class="sec-title">The loop you can reuse</h3>
-          <p class="loop">Run&nbsp;<span aria-hidden="true">&rarr;</span> Map&nbsp;<span aria-hidden="true">&rarr;</span>
-            Audit&nbsp;<span aria-hidden="true">&rarr;</span> Choose&nbsp;<span aria-hidden="true">&rarr;</span>
-            Test&nbsp;<span aria-hidden="true">&rarr;</span> Verify</p>
-          <p class="sec-note">Repeat for the next behaviour or area that needs deeper inspection.</p>
-          <aside class="checkpoint" aria-label="Workshop summary checkpoint">
-            <span class="checkpoint-label">Before you finish</span>
-            <span class="checkpoint-head">Show the evidence, not just the output</span>
-            <ul>
-              <li>Show the running app and explain one path through it.</li>
-              <li>Trace a codebase document's finding back to its source.</li>
-              <li>Explain one confirmed test gap and the regression a proposed or added test would catch.</li>
-              <li>Show the focused test results, or clearly state what could not run and why.</li>
-            </ul>
-            <p>No measured before-and-after coverage? Do not claim a percentage improvement. Describe the behaviour
-              now protected and any work still outstanding.</p>
+          <h3 class="sec-title">What we explored together</h3>
+          <ul class="capstone-list">
+            <li><strong>A clear goal:</strong> move from issue-driven sessions to reviewable pull requests and useful recurring automations.</li>
+            <li><strong>From issue to action:</strong> start a session with the issue attached, request a plan in Plan mode, review its scope,
+              risks and test approach, then approve the implementation when you are satisfied.</li>
+            <li><strong>From code to a merge decision:</strong> create a focused PR linked to the issue, invite Copilot Code Review,
+              address feedback and confirm checks and required approvals. Human review and repository rules still govern merging.</li>
+            <li><strong>From repeat work to a workflow:</strong> connect a trigger, clear instructions, safe tools and repository context.
+              Test runs and review their outputs. Our release-notes example proposes a dated changelog PR; no merged work means no PR.
+              The recording shows saved configuration, not a successful run.</li>
+          </ul>
+          <h3 class="sec-title">A pattern to take with you</h3>
+          <p class="loop">Issue &rarr; Plan &rarr; Approve &rarr; Implement &rarr; Review &rarr; Automate</p>
+          <p class="sec-note">Use the issue, plan and PR review workflow when your task involves code changes.
+            Not every useful automation needs code, and not every scheduled run needs a new plan approval.
+            Choose the right context and boundaries, check permissions, timezone and costs, and inspect actual results rather than assuming success.</p>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">1</span><span class="stage-title">Let&rsquo;s find a problem worth solving</span></summary>
+            <div class="stage-body">
+              <p><strong>What task do you repeat every day or week that you would rather spend less time on?</strong>
+                Let&rsquo;s hear from everyone, across roles. Describe the steps you do manually, how often you do them,
+                who benefits and where time, errors or delays creep in. What output would make your day easier?</p>
+              <p>A narrow, useful problem beats a complicated demo. Think of weekly release notes, a PR follow-up summary,
+                new-issue triage or a CI failure summary. These are inspiration, not required choices&mdash;bring a challenge from your own work.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">2</span><span class="stage-title">Before the next workshop: submit your idea</span></summary>
+            <div class="stage-body">
+              <p>The next workshop is the <strong>final workshop in this series</strong>. Your capstone is a Copilot automation that solves
+                a realistic day-to-day work challenge. <strong>Everyone must submit an idea before the next workshop</strong>,
+                not just people who volunteer to present.</p>
+              <p>Choose one real problem and prepare a short explanation of the following. This is guidance for shaping your idea,
+                not a list of the form&rsquo;s exact fields:</p>
+              <ul class="capstone-list">
+                <li><strong>Problem and current process:</strong> what you do today, including the repetitive manual steps.</li>
+                <li><strong>Intended users:</strong> who will use or benefit from the automation.</li>
+                <li><strong>Trigger and frequency:</strong> when it should run&mdash;on a schedule, an event or on demand.</li>
+                <li><strong>Context and access:</strong> the repository or data it needs, required tools and access you already have or need approved.</li>
+                <li><strong>Desired output:</strong> what a useful result looks like, such as a summary, draft or reviewable PR.</li>
+                <li><strong>Benefit and success measure:</strong> how you will tell whether it helps&mdash;time saved, fewer errors or faster handoffs.</li>
+              </ul>
+              <a class="cl-btn capstone-submit" href="https://forms.cloud.microsoft/r/78RyUnVWnF" target="_blank"
+                rel="noopener noreferrer" title="Congruent Automation Capstone Idea Submission">Submit your automation idea &rarr;</a>
+              <p class="sec-note">The link opens the Congruent Automation Capstone Idea Submission form in a new tab.
+                Submit before the next workshop, and keep secrets, credentials and sensitive work data out of your submission.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">3</span><span class="stage-title">Build a small capstone and test it safely</span></summary>
+            <div class="stage-body">
+              <p><strong>Start preparing and testing your automation so you can demonstrate it at the final workshop.</strong>
+                Use the Copilot app to configure its trigger, write clear instructions and allow only the tools the task needs.
+                Use approved access; do not add unapproved connectors or share credentials to make the demo work.</p>
+              <p>Try it with non-sensitive sample data first. Inspect the run status, logs and output, then adjust your instructions or tools if needed.
+                Keep human review for external changes and pull requests. When code changes are involved, apply the issue, reviewed plan,
+                approval and PR review workflow we explored.</p>
+              <p>Prepare to show the problem, your configuration and a real sample result. A screenshot or saved sample can help illustrate
+                the result if a live run is slow. Be clear about what worked, what still needs attention and what the automation cannot do.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">4</span><span class="stage-title">At the final workshop: be ready to share your impact</span></summary>
+            <div class="stage-body">
+              <p>We will <strong>pick names at random</strong> and invite those participants to share their capstones.
+                This is a chance to learn from one another, not a competition or ranking. Everyone should prepare and be ready,
+                whether or not their name is selected.</p>
+              <ul class="capstone-list">
+                <li><strong>Explain the problem:</strong> the real task and who it affects.</li>
+                <li><strong>Demonstrate the automation:</strong> its trigger, instructions, tools and a sample result.</li>
+                <li><strong>Show what it solves:</strong> how the output changes the manual process and who benefits.</li>
+                <li><strong>Describe the impact:</strong> less repetitive work, fewer errors or faster handoffs, supported by evidence where possible.</li>
+                <li><strong>Share one learning or limitation:</strong> what you adjusted, what surprised you or what still needs improvement.</li>
+              </ul>
+              <p>A simple starting measure is <strong>minutes saved per run &times; runs per week</strong>.
+                For example, an estimated 10 minutes saved on three weekly runs would be an estimated 30 minutes per week.
+                Label estimates clearly; report measured benefits only when you have measured them. No savings are guaranteed.</p>
+              <p class="sec-note">Use non-sensitive examples in your demonstration. Do not show secrets, credentials or confidential data in prompts,
+                logs, screenshots or sample outputs.</p>
+            </div>
+          </details>
+
+          <aside class="checkpoint" aria-label="Capstone preparation checkpoint">
+            <span class="checkpoint-label">Your next action</span>
+            <span class="checkpoint-head">Choose a problem. Submit your idea. Build, test and be ready to share.</span>
+            <p>Bring one useful automation to our final workshop and help the audience see the problem it solves, its practical impact
+              and what you learned along the way.</p>
           </aside>
-
-          <h3 class="sec-title">Keep these resources</h3>
-          <div class="resource-grid">
-            <section class="resource-card" style="--resource-accent: var(--workshop-green);">
-              <h4>Tailspin Toys</h4>
-              <a class="resource-go" href="https://github.com/github-samples/tailspin-toys" target="_blank"
-                rel="noopener noreferrer">Open the template &#8599;</a>
-            </section>
-            <section class="resource-card" style="--resource-accent: var(--workshop-blue);">
-              <h4>Acquire Codebase Knowledge</h4>
-              <a class="resource-go" href="https://awesome-copilot.github.com/skill/acquire-codebase-knowledge/"
-                target="_blank" rel="noopener noreferrer">Open the skill &#8599;</a>
-            </section>
-            <section class="resource-card" style="--resource-accent: var(--workshop-purple);">
-              <h4>Test Gap Audit</h4>
-              <a class="resource-go" href="https://awesome-copilot.github.com/skill/test-gap-audit/"
-                target="_blank" rel="noopener noreferrer">Open the skill &#8599;</a>
-            </section>
-          </div>
-          <h3 class="sec-title">Try it in your own repository</h3>
-          <p class="sec-note">Choose one unfamiliar area, map it, audit its tests and add one reviewed regression test.
-            Keep the change focused, record the checks and share unresolved questions with your team.</p>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
