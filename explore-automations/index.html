@@ -1349,6 +1349,10 @@
     #good .plan-review-list { display: grid; gap: 12px; margin: 0; padding-left: 22px; color: var(--workshop-muted); font-size: 0.94rem; line-height: 1.6; }
     #good .plan-review-list strong { color: var(--workshop-text); }
     @media (max-width: 720px) { #good #issue-plan-prompt { height: 430px; } }
+    #round2 #release-notes-prompt { height: 220px; resize: none; }
+    #round2 .automation-list { display: grid; gap: 12px; margin: 0; padding-left: 22px; color: var(--workshop-muted); line-height: 1.6; }
+    #round2 .automation-list strong { color: var(--workshop-text); }
+    @media (max-width: 720px) { #round2 #release-notes-prompt { height: 620px; } }
     /* ============ End mission control ============ */
   </style>
 </head>
@@ -1416,7 +1420,7 @@
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="round2">
               <span class="cl-step-num"><span class="digit">4</span><span class="tick">&#10003;</span></span>
-              <span class="cl-step-name">Audit test gaps and add coverage</span>
+              <span class="cl-step-name">From repeat work to automated workflows</span>
               <span class="cl-step-time">25 min</span>
             </button></li>
           <li><button class="cl-step-item" type="button" data-target="wrap">
@@ -1676,137 +1680,139 @@
           </nav>
         </article>
 
-        <!-- Step 4: Audit test gaps and add coverage -->
+        <!-- Step 4: Create a release-notes automation -->
         <article class="cl-step mcp-lab" id="round2" data-minutes="25" tabindex="-1">
           <span class="cl-duration">Duration: 25 minutes</span>
-          <h2>Find test gaps. <span class="accent">Add meaningful coverage.</span></h2>
+          <h2>From repeat work to <span class="accent">automated workflows</span></h2>
 
           <div class="sowhat is-step" role="note">
             <span class="sowhat-label">So what</span>
-            <strong class="sowhat-head">A passing test suite does not prove every important behaviour.</strong>
-            <span>Use the codebase map to find missing or weak tests, then turn one verified gap into a regression test.</span>
+            <strong class="sowhat-head">Describe it once. Let Copilot pick up the repeat work.</strong>
+            <span>Turn a weekly release-notes chore into a reviewable pull request&mdash;without handing over the merge decision.</span>
           </div>
 
-          <details class="stage" open>
-            <summary><span class="stage-num">1</span><span class="stage-title">Meet the Test Gap Audit skill</span><span
-                class="stage-time">5 min</span></summary>
-            <div class="stage-body">
-              <p>Open <a href="https://awesome-copilot.github.com/skill/test-gap-audit/" target="_blank"
-                  rel="noopener noreferrer">Test Gap Audit on Awesome Copilot &#8599;</a>. This skill compares code
-                paths with what existing tests actually assert. It stays <strong>read-only</strong> until you
-                explicitly ask it to add tests.</p>
-              <div class="crit-grid is-three">
-                <section class="crit-card" style="--crit: var(--workshop-blue);">
-                  <b>1</b>
-                  <strong>Map the behaviour</strong>
-                  <p>Inspect source, existing tests and repository test conventions.</p>
-                </section>
-                <section class="crit-card" style="--crit: var(--workshop-amber);">
-                  <b>2</b>
-                  <strong>Rank the gaps</strong>
-                  <p>Prioritise by impact, with evidence and concrete test scenarios.</p>
-                </section>
-                <section class="crit-card" style="--crit: var(--workshop-green);">
-                  <b>3</b>
-                  <strong>Prove the behaviour</strong>
-                  <p>Prefer meaningful assertions over a higher coverage percentage alone.</p>
-                </section>
-              </div>
-            </div>
-          </details>
+          <p class="sec-note">An <strong>automation</strong> is a reusable task Copilot can start on a schedule, in response to an event or on demand.
+            Instead of opening a chat and pasting the same prompt every week, save the task once and let its trigger start each run.
+            Every run still needs the right access and clear instructions; saving an automation does not guarantee it will succeed.</p>
 
-          <details class="stage" open>
-            <summary><span class="stage-num">2</span><span class="stage-title">Run a read-only audit of Tailspin Toys</span><span
-                class="stage-time">8 min</span></summary>
-            <div class="stage-body">
-              <figure class="shot">
-                <video controls playsinline preload="metadata" width="2646" height="2140"
-                  aria-label="Tailspin Toys test gap audit demonstration">
-                  <source src="assets/tailspin-toys-test-gap-audit.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                  <a href="assets/tailspin-toys-test-gap-audit.mp4">Open the recording</a>.
-                </video>
-              </figure>
-              <p><label for="test-gap-audit-prompt">Copy this audit prompt into Copilot:</label></p>
-              <div class="tpl">
-                <textarea class="sc-text" id="test-gap-audit-prompt" rows="8" readonly
-                  spellcheck="false">Audit this Tailspin Toys repository using this skill: https://awesome-copilot.github.com/skill/test-gap-audit/
+          <div class="crit-grid is-three">
+            <section class="crit-card" style="--crit: var(--workshop-blue);">
+              <b>1</b><strong>Trigger: when</strong>
+              <p>A weekly time, a repository event or a manual start tells Copilot when to begin.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-amber);">
+              <b>2</b><strong>Instructions: what</strong>
+              <p>Your prompt defines the job, its boundaries and the result you expect from each run.</p>
+            </section>
+            <section class="crit-card" style="--crit: var(--workshop-green);">
+              <b>3</b><strong>Tools: what it may do</strong>
+              <p>Allow only the capabilities needed, such as reading PRs and proposing a changelog update.</p>
+            </section>
+          </div>
 
-Use docs/codebase/TESTING.md and docs/codebase/CONCERNS.md as context, then verify against the current code and tests. Inventory the repository's testable surfaces before inspecting the highest-risk areas. Use the skill's coverage mapping script if available, and verify its leads before calling them confirmed gaps.
+          <p class="sec-note">The selected repository supplies the working context. <strong>Local runs</strong> need your computer and app available;
+            <strong>cloud runs</strong> can start while your laptop is off, subject to repository policies, authentication and available resources.
+            For this example, you need write access and the repository&rsquo;s Copilot cloud agent and automation policies enabled.
+            Available settings can vary by account and organization.</p>
 
-Report prioritised P0-P3 findings with source and test file:line evidence, what the current tests prove, and specific proposed tests with key assertions. Separate confirmed gaps from inferred gaps. State surface counts, list areas surveyed but not deeply inspected, and record checks run or skipped. Do not change any files or add tests yet.</textarea>
-              </div>
-              <p>Read the report before acting. A file without a directly matching test may still be covered indirectly.
-                If the audit cannot finish in this session, use its list of areas not deeply inspected for a follow-up pass.</p>
-            </div>
-          </details>
-
-          <details class="stage" open>
-            <summary><span class="stage-num">3</span><span class="stage-title">Generate a local HTML audit report</span><span
-                class="stage-time">2 min</span></summary>
-            <div class="stage-body">
-              <p>Once the audit is complete, ask Copilot to turn the finalised findings into a simple local HTML page.
-                Save the report outside the repository to keep the audited files unchanged, then open it in your browser.</p>
-              <p><label for="test-gap-report-prompt">Copy this report prompt into Copilot:</label></p>
-              <div class="tpl">
-                <textarea class="sc-text" id="test-gap-report-prompt" rows="3" readonly
-                  spellcheck="false">Please generate the finalised report in a simple local html page</textarea>
-              </div>
-              <figure class="shot">
-                <img src="assets/tailspin-toys-html-audit-report.png"
-                  alt="Copilot session showing the request to generate the finalised test gap audit report in a simple local HTML page">
-              </figure>
-              <p>Keep the priorities, source evidence and checks run or skipped visible in the report.
-                Generating the report does not authorise implementing the suggested fixes or tests.</p>
-              <figure class="shot">
-                <video controls playsinline preload="metadata" width="1536" height="1070"
-                  aria-label="Recording of the local HTML test gap audit report">
-                  <source src="assets/tailspin-toys-html-report-walkthrough.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                  <a href="assets/tailspin-toys-html-report-walkthrough.mp4">Open the recording</a>.
-                </video>
-              </figure>
-            </div>
-          </details>
-
-          <details class="stage" open>
-            <summary><span class="stage-num">4</span><span class="stage-title">Create GitHub issues for the P1 gaps</span><span
-                class="stage-time">10 min</span></summary>
-            <div class="stage-body">
-              <figure class="shot">
-                <video controls playsinline preload="metadata" width="1536" height="1070"
-                  aria-label="Recording showing the request to create two detailed GitHub issues for the P1 test gaps">
-                  <source src="assets/tailspin-toys-create-p1-issues.mp4" type="video/mp4">
-                  Your browser does not support embedded video.
-                  <a href="assets/tailspin-toys-create-p1-issues.mp4">Open the recording</a>.
-                </video>
-              </figure>
-              <p><label for="test-gap-implementation-prompt">Copy this prompt into Copilot:</label></p>
-              <div class="tpl">
-                <textarea class="sc-text" id="test-gap-implementation-prompt" rows="2" readonly
-                  spellcheck="false">Create a detailed github issue for each of the P1 gaps in this repository</textarea>
-              </div>
-              <p>The recording asks for two issues because that audit found two P1 gaps. Your audit may rank gaps
-                differently, so create one issue per P1 gap in your report.</p>
-            </div>
-          </details>
+          <h3 class="sec-title">Friday release notes, delivered as a PR</h3>
+          <p class="sec-note">Give developers, leads and PMs an understandable summary of the week: take recently merged work, group it into
+            plain-language notes, add a dated section to <code>CHANGELOG.md</code> and open a pull request for review.
+            If nothing was merged, report that instead of opening an empty PR. People still review the notes, changed files and checks before any merge.</p>
 
           <figure class="shot">
-            <img src="assets/tailspin-toys-published-p1-issues.png"
-              alt="Repository Issues tab showing two published issues: the database-explorer SQL guard gap and missing seedDatabase unit tests">
-            <figcaption>Example result: both P1 gaps are published as GitHub issues. Your titles will differ.</figcaption>
+            <video controls playsinline preload="metadata" poster="assets/friday-release-notes-poster.jpg" width="2032" height="1318"
+              aria-label="Silent recording of manually creating and saving a cloud automation named Weekly Friday Release, configuring its trigger, tools, instructions and repository; the final card is idle and scheduled for Monday">
+              <source src="assets/friday-release-notes-automation.mp4" type="video/mp4">
+              Your browser does not support embedded video. <a href="assets/friday-release-notes-automation.mp4">Open the recording</a>.
+            </video>
+            <figcaption>Watch the full setup and save with <strong>Create</strong>. The clip ends with an idle automation card&mdash;not a completed run, release notes or a created PR.</figcaption>
           </figure>
 
-          <aside class="checkpoint" aria-label="Test gap audit checkpoint">
+          <details class="stage" open>
+            <summary><span class="stage-num">1</span><span class="stage-title">Give your weekly task a home</span></summary>
+            <div class="stage-body">
+              <p>Open <strong>Automations</strong> in the sidebar, click <strong>+ New automation</strong> at the top right,
+                then choose <strong>Create manually</strong>. Some versions call the entry button <strong>Create automation</strong>.</p>
+              <p>In <strong>Manual automation creation</strong>, enter a recognizable name such as <strong>Weekly Friday Release</strong>.
+                The name is a label, not a schedule: writing &ldquo;Friday&rdquo; here does not choose the day of the run.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">2</span><span class="stage-title">Set Friday and allow only the tools you need</span></summary>
+            <div class="stage-body">
+              <p>Switch <strong>Trigger</strong> from <strong>Daily</strong> to <strong>Weekly</strong>. Choose <strong>Friday</strong> in
+                <strong>Day of week</strong> and a suitable <strong>Time of day</strong>. Enable <strong>Run in the cloud</strong> if you want it
+                to run without your laptop being on.</p>
+              <p class="sec-note"><strong>Recording note:</strong> the example leaves Monday selected, despite its Friday name.
+                For this workshop, explicitly choose Friday. The recorded 9:00 AM India-time selection appears on the saved card as
+                <code>Mon 3:30 AM UTC</code>. Confirm your timezone and the final card&rsquo;s schedule; do not assume every time field is UTC.</p>
+              <p>For a cloud run, open <strong>Tools</strong> and select the capabilities this release-notes task needs.
+                The following are recommended picks, not a claim that the recording selected them all:</p>
+              <ul class="automation-list">
+                <li><strong>Search PRs</strong> &mdash; find pull requests merged into the default branch during the last seven days.</li>
+                <li><strong>Read PR</strong> &mdash; understand each change and collect its link and author.</li>
+                <li><strong>Get file</strong> &mdash; read the existing <code>CHANGELOG.md</code> before adding notes.</li>
+                <li><strong>Commit and push changes</strong> &mdash; save the changelog update on a branch.</li>
+                <li><strong>Create PR</strong> &mdash; propose that branch&rsquo;s notes for review.</li>
+              </ul>
+              <p class="sec-note">The clip searches tools for issues and pull requests, but the final form says <strong>1 tool selected</strong>.
+                That is not evidence of a complete permission set. Check your selections against the task above; <strong>Merge PR is not needed</strong>.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">3</span><span class="stage-title">Tell Copilot exactly what each run should deliver</span></summary>
+            <div class="stage-body">
+              <p><label for="release-notes-prompt">Click <strong>Copy</strong>, then paste this exact prompt into <strong>Instructions for each run</strong>:</label></p>
+              <div class="tpl">
+                <textarea class="sc-text" id="release-notes-prompt" rows="14" readonly spellcheck="false">Write release notes for pull requests merged into the default branch in the last 7 days.
+- Group them under Features, Fixes, Docs, and Maintenance.
+- Write one plain-English line per PR that a non-developer can understand, with its link.
+- End with a "Thanks to" line crediting the authors.
+Add the notes as a new dated section at the top of CHANGELOG.md (create it if missing), then open a pull request titled "Release notes: week of &lt;date&gt;".
+If nothing was merged, don't open a pull request; just say so.</textarea>
+              </div>
+              <p>The prompt fixes the time window and categories, asks for readable lines with traceable PR links and credits the authors.
+                It defines the deliverable as a dated changelog section and a reviewable PR, with a no-merge/no-PR fallback.
+                Copilot should replace <code>&lt;date&gt;</code> in the title with the appropriate date for the release-note week.</p>
+              <p class="sec-note">Even Personal cloud automation prompts and session logs are visible to repository readers.
+                Never include secrets or sensitive information in these instructions.</p>
+            </div>
+          </details>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">4</span><span class="stage-title">Save it, test a run and review the result</span></summary>
+            <div class="stage-body">
+              <p>Choose your own <strong>Repository</strong> with write access, then select an available model and agent using the controls below
+                the prompt. The clip uses a repository named SE-COCKPIT; it is just an example, not a workshop requirement.</p>
+              <p>For cloud automations, choose <strong>Personal</strong> or <strong>Shared</strong> under <strong>Type</strong>.
+                Personal automations use your identity and credits; Shared automations are visible to people with repository access and use
+                Copilot&rsquo;s identity with credits charged to the repository owner. Choose deliberately: type cannot be changed after creation.</p>
+              <p>Optionally expand <strong>AI credit limits</strong> to set per-run and daily limits appropriate to your budget.
+                Review the repository, tools, scope and Friday schedule before saving: only the release-note change to <code>CHANGELOG.md</code>
+                is expected, not unrelated code edits or an automatic merge.</p>
+              <p>Click <strong>Create</strong> to save. To save and test immediately, open its dropdown and choose <strong>Create and run</strong>.
+                The recording reveals that option but actually saves with <strong>Create</strong>. Its final <strong>Idle</strong> card confirms
+                saved configuration only; check the displayed day, time and repository.</p>
+              <p>When ready, test the saved automation using the card&rsquo;s play button. Open the resulting run to inspect its status and logs.
+                If it creates a PR, review the notes, links, authors, changed files and required checks before deciding whether to merge.
+                If there were no merges, expect a message and no PR; errors or a saved card alone are not successful output.</p>
+              <p class="sec-note">Before a repeat manual run, check for an existing release-note PR or dated section for the same week to avoid
+                duplicate notes. Test the configuration before relying on its weekly schedule.</p>
+            </div>
+          </details>
+
+          <aside class="checkpoint" aria-label="Automation readiness checkpoint">
             <span class="checkpoint-label">Checkpoint</span>
-            <span class="checkpoint-head">Raise your GitHub issues</span>
-            <ul>
-              <li>Create one GitHub issue in your own <strong>tailspin-toys</strong> repository for each P1 gap from
-                your audit.</li>
-              <li>Include the finding, source evidence and proposed tests in each issue.</li>
-              <li>Open the repository's Issues tab and confirm the issues are published, not just drafted in chat.</li>
-            </ul>
+            <span class="checkpoint-head">Scheduled correctly. Scoped carefully. Reviewed by you.</span>
+            <p>Confirm Friday, the timezone, repository and task-specific tools. A saved automation is the beginning;
+              a successful run and a reviewed PR are the evidence that the workflow works.</p>
           </aside>
+
+          <p class="sec-note"><a href="https://docs.github.com/en/copilot/how-tos/github-copilot-app/using-automations" target="_blank"
+              rel="noopener noreferrer">Learn more about Copilot app automations, cloud policies and AI credit limits &rarr;</a></p>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
@@ -2189,6 +2195,14 @@ Report prioritised P0-P3 findings with source and test file:line evidence, what 
   <script>
     (function () {
       var video = document.querySelector('#mcp video[poster="assets/tailspin-toys-create-pr-poster.jpg"]');
+      video.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.stopPropagation(); }
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      var video = document.querySelector('#round2 video[poster="assets/friday-release-notes-poster.jpg"]');
       video.addEventListener("keydown", function (event) {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.stopPropagation(); }
       });
