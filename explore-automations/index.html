@@ -2185,6 +2185,14 @@ Report prioritised P0-P3 findings with source and test file:line evidence, what 
       });
     })();
   </script>
+  <script>
+    (function () {
+      var video = document.querySelector('#good video[poster="assets/tailspin-toys-plan-from-issue-poster.jpg"]');
+      video.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.stopPropagation(); }
+      });
+    })();
+  </script>
   <script data-fx>
     /* Mission control: optional effects, independent of workshop routing. */
     (function () {
