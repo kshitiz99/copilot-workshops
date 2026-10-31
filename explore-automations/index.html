@@ -1343,6 +1343,8 @@
     #good .plan-timeline li::before { content: counter(evidence); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; border: 1px solid #a68ae77a; background: linear-gradient(140deg, #514185, #233d60); color: #e5dcff; font-family: var(--font-display); font-weight: 700; }
     #good .plan-timeline li:not(:last-child)::after { content: ""; position: absolute; left: 14px; top: 36px; bottom: 6px; width: 1px; background: #7895bd66; }
     #good .plan-timeline strong { color: var(--workshop-text); }
+    #good .plan-review-list { display: grid; gap: 12px; margin: 0; padding-left: 22px; color: var(--workshop-muted); font-size: 0.94rem; line-height: 1.6; }
+    #good .plan-review-list strong { color: var(--workshop-text); }
     @media (max-width: 720px) { #good #issue-plan-prompt { height: 430px; } }
     /* ============ End mission control ============ */
   </style>
@@ -1567,6 +1569,37 @@
             <span class="checkpoint-head">Review before you approve</span>
             <p>Expect a plan covering the approach, implementation steps, potential risks and expected outcomes. Copilot waits for your go-ahead before implementing anything.</p>
           </aside>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">4</span><span class="stage-title">Review the plan. Give Copilot the go-ahead.</span></summary>
+            <div class="stage-body">
+              <p>Read the full plan in the right-hand <strong>Plan</strong> tab before deciding. The task list is only a summary: scroll through the problem and intended outcome, confirmed scope and decisions, and the evidence from the current checkout.</p>
+              <figure class="shot">
+                <img src="assets/tailspin-toys-approve-plan.png"
+                  alt="Before approval, the Plan tab shows a five-task Database Explorer regression-coverage plan, its scope and checkout evidence; Approve and implement this plan is selected and Continue is highlighted"
+                  width="2000" height="1248">
+                <figcaption>Review plan details and approval choice. This screenshot shows the decision just before approval.</figcaption>
+              </figure>
+
+              <h3 class="sec-title">A practical review checklist</h3>
+              <ul class="plan-review-list">
+                <li><strong>Does it solve the issue?</strong> Check the problem statement and intended outcome against what you need done.</li>
+                <li><strong>Is the scope right?</strong> Look at the confirmed decisions and out-of-scope work. Make sure the plan stays focused and respects any boundaries.</li>
+                <li><strong>Will the approach work?</strong> Review the implementation and test strategy, including how it handles important edge cases.</li>
+                <li><strong>Are risks and dependencies covered?</strong> Check assumptions, compatibility and anything that could block or change the work.</li>
+                <li><strong>How will you know it succeeded?</strong> Look for concrete validation and success criteria, not just a list of files to edit.</li>
+              </ul>
+
+              <p>In this example, the five tasks move from extracting the production query policy and wiring the extension test harness through boundary and database-entry-point coverage, then documentation and validation. That sequence is specific to this regression-coverage issue; another issue may need different files, tests or dependencies.</p>
+
+              <h3 class="sec-title">Choose what happens next</h3>
+              <ol class="plan-timeline">
+                <li><strong>Ready to proceed?</strong> In <strong>Review plan</strong>, select <strong>Approve and implement this plan</strong>, then click <strong>Continue</strong>.</li>
+                <li><strong>Need more work on the plan?</strong> Do not approve it yet. Choose <strong>Exit plan mode and I will prompt myself</strong> to give Copilot feedback, then ask for revisions and review the updated plan before approving.</li>
+              </ol>
+              <p class="sec-note">Approval authorizes Copilot to implement the reviewed plan; it does not automatically merge or deploy the changes, or guarantee they are correct. Review the resulting changes and test outcomes before deciding what to do next.</p>
+            </div>
+          </details>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
