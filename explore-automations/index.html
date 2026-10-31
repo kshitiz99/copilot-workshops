@@ -1338,6 +1338,9 @@
     #good .prompt-asks { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
     #good .prompt-asks li { padding: 6px 10px; border: 1px solid #5b7398; border-radius: 999px; background: #192a42; color: #d7e8ff; font-size: 0.8rem; }
     #good .prompt-asks li:last-child { border-color: #77d5a7; background: #16372d; color: #a7f3cd; }
+    #mcp .pr-look { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+    #mcp .pr-look li { padding: 6px 10px; border: 1px solid #5b7398; border-radius: 999px; background: #192a42; color: #d7e8ff; font-size: 0.8rem; }
+    #mcp .pr-look li:last-child { border-color: #77d5a7; background: #16372d; color: #a7f3cd; }
     #good .plan-timeline { list-style: none; counter-reset: evidence; margin: 0; padding: 0; }
     #good .plan-timeline li { position: relative; counter-increment: evidence; padding: 0 0 22px 48px; color: var(--workshop-muted); font-size: 0.94rem; line-height: 1.6; }
     #good .plan-timeline li::before { content: counter(evidence); position: absolute; left: 0; top: 0; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 10px; border: 1px solid #a68ae77a; background: linear-gradient(140deg, #514185, #233d60); color: #e5dcff; font-family: var(--font-display); font-weight: 700; }
@@ -1632,6 +1635,33 @@
             Copilot can help refine the changes, test them and explain the results, but AI output or green checks alone do not guarantee readiness.
             Repository rules and human review still govern the decision. The outcome is a focused, understandable, validated PR
             ready for review and a merge decision&mdash;not an automatic merge or deployment.</p>
+
+          <details class="stage" open>
+            <summary><span class="stage-num">1</span><span class="stage-title">Turn approved work into a pull request</span></summary>
+            <div class="stage-body">
+              <p>When Copilot finishes the approved work, click <strong>Create PR</strong> at the top of your session. Not ready for review yet? Open the arrow beside it and choose <strong>Create draft PR</strong> instead.</p>
+              <figure class="shot">
+                <video controls playsinline preload="metadata" poster="assets/tailspin-toys-create-pr-poster.jpg" width="1960" height="1270"
+                  aria-label="Recording of a Copilot session for Issue #164: the Create PR menu is opened, Create PR stays selected and is clicked, and a request to open a pull request from the session branch to main is sent">
+                  <source src="assets/tailspin-toys-create-pr.mp4" type="video/mp4">
+                  Your browser does not support embedded video.
+                  <a href="assets/tailspin-toys-create-pr.mp4">Open the recording</a>.
+                </video>
+                <figcaption>Open the menu, keep <strong>Create PR</strong> selected and click it&mdash;Copilot starts opening a PR from your session&rsquo;s branch to <code>main</code>.</figcaption>
+              </figure>
+              <p>Once it&rsquo;s created, the PR opens right beside your session&mdash;linked to your issue, with a full description for reviewers. It&rsquo;s now open for review, not merged.</p>
+              <figure class="shot">
+                <img src="assets/tailspin-toys-pr-created.png" alt="Copilot confirms PR #171 is open against main; the PR panel shows Open status, Review required, Copilot as reviewer, a link to issue #164 and the PR description" width="2000" height="1296">
+                <figcaption>PR #171 is open against <code>main</code>, linked to issue #164 and awaiting review.</figcaption>
+              </figure>
+              <ul class="pr-look" aria-label="What to check on your new pull request">
+                <li>Open &middot; your branch &rarr; main</li>
+                <li>Linked issue</li>
+                <li>Description &amp; changed files</li>
+                <li>Checks &amp; reviews</li>
+              </ul>
+            </div>
+          </details>
 
           <nav class="cl-nav">
             <button class="cl-btn cl-back" type="button">&larr; Back</button>
@@ -2144,6 +2174,14 @@ Report prioritised P0-P3 findings with source and test file:line evidence, what 
   <script>
     (function () {
       var video = document.querySelector('#good video[poster="assets/tailspin-toys-plan-from-issue-poster.jpg"]');
+      video.addEventListener("keydown", function (event) {
+        if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.stopPropagation(); }
+      });
+    })();
+  </script>
+  <script>
+    (function () {
+      var video = document.querySelector('#mcp video[poster="assets/tailspin-toys-create-pr-poster.jpg"]');
       video.addEventListener("keydown", function (event) {
         if (event.key === "ArrowLeft" || event.key === "ArrowRight") { event.stopPropagation(); }
       });
